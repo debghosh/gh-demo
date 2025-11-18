@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Portal | The Golden Hues</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-page">
+    <!-- Top Navigation -->
+    <nav class="dashboard-nav">
+        <div class="nav-brand">
+            <h1>The Golden Hues</h1>
+            <p>Sudhin</p>
+        </div>
+        <div class="nav-actions">
+            <div class="cart-icon" onclick="CustomerPortal.showCart()">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cartCount" class="cart-badge">0</span>
+            </div>
+            <div class="user-menu">
+                <span id="userName">Ananya Roy</span>
+                <button id="logoutBtn" class="btn-logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <ul class="sidebar-nav">
+                <li class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li class="nav-item" data-section="menu">
+                    <i class="fas fa-utensils"></i>
+                    <span>Menu & Order</span>
+                </li>
+                <li class="nav-item" data-section="quiz">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Daily Quiz</span>
+                </li>
+                <li class="nav-item" data-section="bookings">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Book Spaces</span>
+                </li>
+                <li class="nav-item" data-section="rewards">
+                    <i class="fas fa-trophy"></i>
+                    <span>Rewards</span>
+                </li>
+                <li class="nav-item" data-section="profile">
+                    <i class="fas fa-user"></i>
+                    <span>My Profile</span>
+                </li>
+                <li class="nav-item" data-section="history">
+                    <i class="fas fa-history"></i>
+                    <span>Order History</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section-content active">
+                <h2 class="section-title">Welcome, <span id="userNameTitle">Ananya</span>!</h2>
+                
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card gold">
+                        <div class="stat-icon"><i class="fas fa-star"></i></div>
+                        <div class="stat-info">
+                            <h3 id="swarPoints">3,250</h3>
+                            <p>Swar Points</p>
+                        </div>
+                    </div>
+                    <div class="stat-card teal">
+                        <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
+                        <div class="stat-info">
+                            <h3 id="userTier">Rasik</h3>
+                            <p>Current Tier</p>
+                        </div>
+                    </div>
+                    <div class="stat-card burgundy">
+                        <div class="stat-icon"><i class="fas fa-coffee"></i></div>
+                        <div class="stat-info">
+                            <h3 id="totalVisits">24</h3>
+                            <p>Total Visits</p>
+                        </div>
+                    </div>
+                    <div class="stat-card cream">
+                        <div class="stat-icon"><i class="fas fa-rupee-sign"></i></div>
+                        <div class="stat-info">
+                            <h3 id="totalSpent">₹12,500</h3>
+                            <p>Total Spent</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tier Progress -->
+                <div class="tier-progress-card">
+                    <h3>Your Journey to <span class="next-tier">Kalakar</span></h3>
+                    <div class="progress-bar">
+                        <div id="tierProgress" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <p id="tierProgressText" class="progress-text">Loading...</p>
+                </div>
+
+                <!-- Badges -->
+                <div class="badges-section">
+                    <h3>Your Badges <span class="badge-count">(<span id="badgeCount">4</span>)</span></h3>
+                    <div id="badgesContainer" class="badges-grid">
+                        <!-- Badges will be dynamically loaded -->
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <button class="action-btn" onclick="CustomerPortal.showSection('menu')">
+                        <i class="fas fa-coffee"></i>
+                        Order Now
+                    </button>
+                    <button class="action-btn" onclick="CustomerPortal.showSection('quiz')">
+                        <i class="fas fa-question-circle"></i>
+                        Daily Quiz
+                    </button>
+                    <button class="action-btn" onclick="CustomerPortal.showSection('bookings')">
+                        <i class="fas fa-calendar"></i>
+                        Book Space
+                    </button>
+                </div>
+            </section>
+
+            <!-- Menu Section -->
+            <section id="menu" class="section-content">
+                <h2 class="section-title">Composer's Collection</h2>
+                
+                <div class="menu-filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="hot">Hot Drinks</button>
+                    <button class="filter-btn" data-filter="cold">Cold Drinks</button>
+                    <button class="filter-btn" data-filter="dessert">Desserts</button>
+                </div>
+
+                <div id="menuItemsContainer" class="menu-items-grid">
+                    <!-- Menu items will be dynamically loaded -->
+                </div>
+            </section>
+
+            <!-- Quiz Section -->
+            <section id="quiz" class="section-content">
+                <h2 class="section-title">Daily Quiz Challenge</h2>
+                <p class="section-subtitle">Test your knowledge about Bengal's Golden Era and earn Swar Points!</p>
+                
+                <div id="quizContainer" class="quiz-container">
+                    <!-- Quiz will be dynamically loaded -->
+                </div>
+
+                <div class="quiz-leaderboard">
+                    <h3>This Month's Top Performers</h3>
+                    <div class="leaderboard-list">
+                        <div class="leaderboard-item">
+                            <span class="rank">#1</span>
+                            <span class="name">Rajesh Kumar</span>
+                            <span class="score">2,850 pts</span>
+                        </div>
+                        <div class="leaderboard-item">
+                            <span class="rank">#2</span>
+                            <span class="name">Priya Sengupta</span>
+                            <span class="score">2,640 pts</span>
+                        </div>
+                        <div class="leaderboard-item highlight">
+                            <span class="rank">#3</span>
+                            <span class="name">You (Ananya Roy)</span>
+                            <span class="score">2,380 pts</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bookings Section -->
+            <section id="bookings" class="section-content">
+                <h2 class="section-title">Book Your Space</h2>
+                
+                <div id="bookingsContainer" class="bookings-container">
+                    <div class="booking-options">
+                        <div class="booking-card" onclick="CustomerPortal.showBookingForm('meeting')">
+                            <div class="booking-icon"><i class="fas fa-users"></i></div>
+                            <h3>Meeting Zone</h3>
+                            <p>Professional pods for 2-10 people</p>
+                            <div class="booking-price">₹200-500/hour</div>
+                            <ul class="booking-features">
+                                <li><i class="fas fa-check"></i> High-speed WiFi</li>
+                                <li><i class="fas fa-check"></i> Projector & Whiteboard</li>
+                                <li><i class="fas fa-check"></i> Free Refreshments</li>
+                            </ul>
+                            <button class="btn-primary">Book Now</button>
+                        </div>
+                        
+                        <div class="booking-card featured">
+                            <div class="featured-tag">Most Popular</div>
+                            <div class="booking-icon"><i class="fas fa-microphone"></i></div>
+                            <h3>Performance Zone</h3>
+                            <p>Intimate stage for 50-80 people</p>
+                            <div class="booking-price">₹1,500-3,000/hour</div>
+                            <ul class="booking-features">
+                                <li><i class="fas fa-check"></i> Professional Audio</li>
+                                <li><i class="fas fa-check"></i> Lighting Setup</li>
+                                <li><i class="fas fa-check"></i> Recording Available</li>
+                            </ul>
+                            <button class="btn-primary">Book Now</button>
+                        </div>
+                    </div>
+
+                    <div class="my-bookings">
+                        <h3>My Upcoming Bookings</h3>
+                        <div class="booking-list">
+                            <div class="booking-item">
+                                <i class="fas fa-calendar-check"></i>
+                                <div class="booking-details">
+                                    <h4>Meeting Zone - Pod 2</h4>
+                                    <p>Nov 25, 2025 | 3:00 PM - 5:00 PM</p>
+                                </div>
+                                <button class="btn-small btn-secondary">Modify</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Rewards Section -->
+            <section id="rewards" class="section-content">
+                <h2 class="section-title">Your Rewards</h2>
+                <p class="section-subtitle">Redeem your Swar Points for amazing rewards!</p>
+                
+                <div id="rewardsContainer" class="rewards-grid">
+                    <!-- Rewards will be dynamically loaded -->
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profile" class="section-content">
+                <h2 class="section-title">My Profile</h2>
+                
+                <div class="profile-container">
+                    <div class="profile-card">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <h3>Ananya Roy</h3>
+                        <p class="profile-email">ananya@example.com</p>
+                        <p class="profile-phone">+91 98765 43210</p>
+                        
+                        <div class="profile-stats">
+                            <div class="profile-stat">
+                                <strong>Member Since</strong>
+                                <span>Oct 2024</span>
+                            </div>
+                            <div class="profile-stat">
+                                <strong>Birthday</strong>
+                                <span>March 15</span>
+                            </div>
+                        </div>
+                        
+                        <button class="btn-primary">Edit Profile</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section id="history" class="section-content">
+                <h2 class="section-title">Order History</h2>
+                
+                <div class="history-list">
+                    <div class="history-item">
+                        <div class="history-date">Nov 15, 2025</div>
+                        <div class="history-details">
+                            <h4>Ei Poth Espresso x2, Golden Era Cheesecake</h4>
+                            <p>₹540 | +540 Swar Points</p>
+                        </div>
+                        <div class="history-status completed">Completed</div>
+                    </div>
+                    <div class="history-item">
+                        <div class="history-date">Nov 12, 2025</div>
+                        <div class="history-details">
+                            <h4>Phire Aye Latte, Nostalgia Brownies</h4>
+                            <p>₹340 | +340 Swar Points</p>
+                        </div>
+                        <div class="history-status completed">Completed</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div id="cartSidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <button class="cart-close" onclick="CustomerPortal.closeCart()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="cartItems" class="cart-items">
+            <!-- Cart items will be dynamically loaded -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotal">₹0</span>
+            </div>
+            <button class="btn-primary btn-block" onclick="CustomerPortal.checkout()">
+                Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/customer.js"></script>
+</body>
+</html>

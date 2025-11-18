@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Portal | The Golden Hues</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-page">
+    <nav class="dashboard-nav">
+        <div class="nav-brand">
+            <h1>The Golden Hues</h1>
+            <p>Staff Portal</p>
+        </div>
+        <div class="nav-actions">
+            <div class="user-menu">
+                <span>Staff Member</span>
+                <button class="btn-logout" onclick="window.location.href='index.html'">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <ul class="sidebar-nav">
+                <li class="nav-item active" data-section="orders">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Active Orders</span>
+                </li>
+                <li class="nav-item" data-section="checkin">
+                    <i class="fas fa-qrcode"></i>
+                    <span>Check-in</span>
+                </li>
+                <li class="nav-item" data-section="customers">
+                    <i class="fas fa-users"></i>
+                    <span>Customer Lookup</span>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <section id="orders" class="section-content active">
+                <h2 class="section-title">Active Orders</h2>
+                
+                <div class="orders-list">
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">#1234</span>
+                            <span class="order-status pending">Pending</span>
+                        </div>
+                        <div class="order-body">
+                            <p><strong>Table:</strong> 5</p>
+                            <p><strong>Items:</strong> Ei Poth Espresso x2, Golden Era Cheesecake</p>
+                            <p><strong>Total:</strong> ₹540</p>
+                        </div>
+                        <div class="order-actions">
+                            <button class="btn-success btn-small" onclick="alert('Order marked as ready!')">Mark Ready</button>
+                        </div>
+                    </div>
+                    
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">#1233</span>
+                            <span class="order-status pending">Pending</span>
+                        </div>
+                        <div class="order-body">
+                            <p><strong>Table:</strong> 8</p>
+                            <p><strong>Items:</strong> Phire Aye Latte, Nostalgia Brownies</p>
+                            <p><strong>Total:</strong> ₹340</p>
+                        </div>
+                        <div class="order-actions">
+                            <button class="btn-success btn-small" onclick="alert('Order marked as ready!')">Mark Ready</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="checkin" class="section-content">
+                <h2 class="section-title">Customer Check-in</h2>
+                
+                <div class="checkin-form">
+                    <input type="text" placeholder="Enter customer phone or email" class="form-control" style="margin-bottom: 1rem;">
+                    <button class="btn-primary" onclick="alert('Customer checked in! +10 Swar Points awarded')">Check In</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

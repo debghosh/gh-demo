@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Portal | The Golden Hues</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-page">
+    <nav class="dashboard-nav">
+        <div class="nav-brand">
+            <h1>The Golden Hues</h1>
+            <p>Artist Portal</p>
+        </div>
+        <div class="nav-actions">
+            <div class="user-menu">
+                <span>Performer</span>
+                <button class="btn-logout" onclick="window.location.href='index.html'">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <ul class="sidebar-nav">
+                <li class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li class="nav-item" data-section="bookings">
+                    <i class="fas fa-calendar"></i>
+                    <span>My Bookings</span>
+                </li>
+                <li class="nav-item" data-section="schedule">
+                    <i class="fas fa-clock"></i>
+                    <span>Schedule</span>
+                </li>
+                <li class="nav-item" data-section="profile">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <section id="dashboard" class="section-content active">
+                <h2 class="section-title">Welcome, Artist!</h2>
+                
+                <div class="info-card">
+                    <i class="fas fa-microphone" style="font-size: 3rem; color: #D4AF37;"></i>
+                    <h3>Performance Zone Booking</h3>
+                    <p>Book the performance zone for your concerts, open mics, or album launches.</p>
+                    <button class="btn-primary" onclick="alert('Booking system coming soon!')">Book Performance Zone</button>
+                </div>
+
+                <div class="upcoming-performances">
+                    <h3>Upcoming Performances</h3>
+                    <div class="performance-card">
+                        <div class="performance-date">Nov 22, 2025</div>
+                        <div class="performance-details">
+                            <h4>Rabindra Sangeet Evening</h4>
+                            <p><i class="fas fa-clock"></i> 7:00 PM - 9:00 PM</p>
+                            <p><i class="fas fa-users"></i> Expected: 60 people</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

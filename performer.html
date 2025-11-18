@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Performer Portal - The Golden Hues | Sudhin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/performer.css">
+</head>
+<body class="dashboard performer-dashboard">
+  <header class="dashboard-header">
+    <div class="container">
+      <div class="dashboard-nav">
+        <div class="nav-brand">
+          <div class="brand-icon">
+            <span class="icon-inner">TGH</span>
+          </div>
+          <div class="brand-text">
+            <div class="brand-name">The Golden Hues</div>
+            <div class="brand-tagline">Performer Portal</div>
+          </div>
+        </div>
+        <div class="nav-actions">
+          <span class="performer-name" id="performerName">Artist Name</span>
+          <a href="index.html" class="btn btn-secondary btn-small">Exit</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <div class="container">
+      <section class="hero-section">
+        <h1 class="hero-title">Showcase Your Art at The Golden Hues</h1>
+        <p class="hero-subtitle">Book the Performance Zone, reach a curated audience, and bring the Golden Era to life through your music.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="submitPerformanceBtn">Submit Performance Request</button>
+          <button class="btn btn-ghost" id="viewSlotsBtn">My Slots</button>
+          <button class="btn btn-secondary" id="feeCalcBtn">Fee Calculator</button>
+        </div>
+      </section>
+
+      <div class="main-grid">
+        <div class="left-column">
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Performance Guidelines</h2>
+            </div>
+            <div class="guidelines-list">
+              <div class="guideline-item">
+                <div class="guideline-icon">🎵</div>
+                <div class="guideline-content">
+                  <h4>Golden Era Focus</h4>
+                  <p>Performances should celebrate Bengali Golden Era music or related cultural content</p>
+                </div>
+              </div>
+              <div class="guideline-item">
+                <div class="guideline-icon">⏱️</div>
+                <div class="guideline-content">
+                  <h4>Duration Options</h4>
+                  <p>Choose from 30, 45, or 60-minute slots. Extended performances available on request</p>
+                </div>
+              </div>
+              <div class="guideline-item">
+                <div class="guideline-icon">💰</div>
+                <div class="guideline-content">
+                  <h4>Transparent Pricing</h4>
+                  <p>Hourly rates: ₹1,500 (off-peak) to ₹3,000 (peak). Use our calculator for estimates</p>
+                </div>
+              </div>
+              <div class="guideline-item">
+                <div class="guideline-icon">📢</div>
+                <div class="guideline-content">
+                  <h4>Promotional Support</h4>
+                  <p>Selected performances get featured placement in our app and social media channels</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">My Submissions</h2>
+              <div class="filter-tabs">
+                <button class="filter-tab active" data-status="all">All</button>
+                <button class="filter-tab" data-status="pending">Pending</button>
+                <button class="filter-tab" data-status="approved">Approved</button>
+                <button class="filter-tab" data-status="rejected">Rejected</button>
+              </div>
+            </div>
+            <div id="submissionsList" class="submissions-list">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <div class="right-column">
+          <div class="panel preview-panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Preview Card</h2>
+            </div>
+            <div class="preview-content" id="previewContent">
+              <div class="empty-state">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <p>Submit a performance to see preview</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel stats-panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Your Stats</h2>
+            </div>
+            <div class="stats-grid-mini">
+              <div class="stat-mini">
+                <div class="stat-mini-value" id="totalPerformances">0</div>
+                <div class="stat-mini-label">Performances</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-value" id="totalAudience">0</div>
+                <div class="stat-mini-label">Audience</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-value" id="avgRating">0.0</div>
+                <div class="stat-mini-label">Avg Rating</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-value" id="totalEarnings">₹0</div>
+                <div class="stat-mini-label">Earnings</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Available Dates</h2>
+            </div>
+            <div class="calendar-mini" id="calendarMini">
+              <div class="calendar-month">November 2025</div>
+              <div class="calendar-grid">
+                <!-- Simplified calendar -->
+                <div class="calendar-day available">18</div>
+                <div class="calendar-day available">19</div>
+                <div class="calendar-day available">20</div>
+                <div class="calendar-day available">21</div>
+                <div class="calendar-day booked">22</div>
+                <div class="calendar-day available">23</div>
+                <div class="calendar-day available">24</div>
+                <div class="calendar-day available">25</div>
+                <div class="calendar-day booked">26</div>
+                <div class="calendar-day available">27</div>
+                <div class="calendar-day available">28</div>
+                <div class="calendar-day available">29</div>
+                <div class="calendar-day available">30</div>
+              </div>
+              <div class="calendar-legend">
+                <span><span class="legend-dot available"></span> Available</span>
+                <span><span class="legend-dot booked"></span> Booked</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Submit Performance Modal -->
+  <div class="modal" id="submitModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Submit Performance Request</h3>
+        <button class="modal-close" id="closeSubmitModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="performanceForm">
+          <div class="form-group">
+            <label>Artist/Group Name *</label>
+            <input type="text" name="artistName" required placeholder="The Melody Makers">
+          </div>
+          <div class="form-group">
+            <label>Performance Title *</label>
+            <input type="text" name="title" required placeholder="Golden Era Tribute">
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Genre *</label>
+              <select name="genre" required>
+                <option value="">Select Genre</option>
+                <option value="classical">Classical</option>
+                <option value="modern-bengali">Modern Bengali</option>
+                <option value="rabindra-sangeet">Rabindra Sangeet</option>
+                <option value="folk">Folk</option>
+                <option value="fusion">Fusion</option>
+                <option value="film-songs">Film Songs</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Duration *</label>
+              <select name="duration" required id="durationSelect">
+                <option value="30">30 minutes</option>
+                <option value="45" selected>45 minutes</option>
+                <option value="60">60 minutes</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Preferred Date *</label>
+              <input type="date" name="date" required>
+            </div>
+            <div class="form-group">
+              <label>Preferred Time *</label>
+              <select name="time" required>
+                <option value="15:00">3:00 PM</option>
+                <option value="17:00">5:00 PM</option>
+                <option value="19:00" selected>7:00 PM</option>
+                <option value="21:00">9:00 PM</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Description *</label>
+            <textarea name="description" rows="3" required placeholder="Tell us about your performance..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Promotional Boost</label>
+            <select name="promo">
+              <option value="none">No Promotion</option>
+              <option value="standard">Standard Promotion (+₹500)</option>
+              <option value="featured">Featured Placement (+₹1000)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Special Requirements (Optional)</label>
+            <textarea name="requirements" rows="2" placeholder="Equipment, setup, etc..."></textarea>
+          </div>
+          <div class="estimated-cost">
+            <span>Estimated Cost:</span>
+            <strong id="estimatedCost">₹2,250</strong>
+          </div>
+          <div class="flex gap-2">
+            <button type="submit" class="btn btn-primary flex-1">Submit Request</button>
+            <button type="button" class="btn btn-secondary" id="cancelSubmit">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fee Calculator Modal -->
+  <div class="modal" id="feeCalcModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Fee Calculator</h3>
+        <button class="modal-close" id="closeFeeCalcModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="calculator">
+          <div class="form-group">
+            <label>Duration</label>
+            <select id="calcDuration">
+              <option value="30">30 minutes</option>
+              <option value="45">45 minutes</option>
+              <option value="60">60 minutes</option>
+              <option value="90">90 minutes</option>
+              <option value="120">120 minutes</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Time Slot</label>
+            <select id="calcTimeSlot">
+              <option value="off-peak">Off-Peak (₹1,500/hr)</option>
+              <option value="peak">Peak (₹3,000/hr)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Promotional Boost</label>
+            <select id="calcPromo">
+              <option value="0">No Promotion</option>
+              <option value="500">Standard (+₹500)</option>
+              <option value="1000">Featured (+₹1,000)</option>
+            </select>
+          </div>
+          <div class="calc-breakdown">
+            <div class="breakdown-row">
+              <span>Base Fee:</span>
+              <span id="calcBase">₹0</span>
+            </div>
+            <div class="breakdown-row">
+              <span>Promotion:</span>
+              <span id="calcPromoFee">₹0</span>
+            </div>
+            <div class="breakdown-row total">
+              <span>Total:</span>
+              <strong id="calcTotal">₹0</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/performer.js"></script>
+</body>
+</html>

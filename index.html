@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Golden Hues | Sudhin - A Tribute to Bengal's Golden Era</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="landing-page">
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <h1>The Golden Hues</h1>
+                <p class="tagline">Sudhin</p>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#menu">Menu</a></li>
+                <li><a href="#spaces">Spaces</a></li>
+                <li><a href="#events">Events</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="#" class="btn-primary" id="loginBtn">Login</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">A Tribute to Bengal's Golden Era</h1>
+            <p class="hero-subtitle">Where melodies meet modernity, and every cup tells a story</p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-icon"><i class="fas fa-music"></i></div>
+                    <div class="stat-content">
+                        <h3>50+</h3>
+                        <p>Live Performances</p>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-content">
+                        <h3 id="memberCount">2,847</h3>
+                        <p>Cultural Enthusiasts</p>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                    <div class="stat-content">
+                        <h3>15,000+</h3>
+                        <p>Swar Points Earned</p>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-cta">
+                <button class="btn-hero-primary" id="getStartedBtn">Begin Your Journey</button>
+                <button class="btn-hero-secondary" onclick="document.getElementById('about').scrollIntoView({behavior: 'smooth'})">Learn More</button>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span>Scroll to Explore</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- Featured Artist Section -->
+    <section id="about" class="featured-artist">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Honoring Sudhin Dasgupta</h2>
+                <div class="title-underline"></div>
+            </div>
+            <div class="artist-content">
+                <div class="artist-image">
+                    <div class="image-placeholder">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="vintage-frame"></div>
+                </div>
+                <div class="artist-info">
+                    <h3>The Maestro of Melodies</h3>
+                    <p class="artist-bio">
+                        Sudhin Dasgupta (1912-1968) was a legendary composer who defined the soundscape of Bengali cinema's golden age. 
+                        His compositions like "Ei Poth Jodi Na Shesh Hoy" and "Phire Aye Chole Aye" continue to resonate across generations.
+                    </p>
+                    <div class="artist-highlights">
+                        <div class="highlight-item">
+                            <i class="fas fa-film"></i>
+                            <span>100+ Film Scores</span>
+                        </div>
+                        <div class="highlight-item">
+                            <i class="fas fa-award"></i>
+                            <span>Multiple BFJA Awards</span>
+                        </div>
+                        <div class="highlight-item">
+                            <i class="fas fa-heart"></i>
+                            <span>Timeless Legacy</span>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" onclick="alert('Quiz feature available after login!')">Test Your Knowledge</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Preview -->
+    <section id="menu" class="menu-preview">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Composer's Collection</h2>
+                <p class="section-subtitle">Every drink named after a timeless melody</p>
+                <div class="title-underline"></div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-card">
+                    <div class="menu-image">
+                        <i class="fas fa-coffee"></i>
+                    </div>
+                    <h3>Ei Poth Espresso</h3>
+                    <p>A journey of rich flavors with caramel notes</p>
+                    <div class="menu-price">₹180</div>
+                    <div class="menu-song">♪ Ei Poth Jodi Na Shesh Hoy</div>
+                </div>
+                <div class="menu-card">
+                    <div class="menu-image">
+                        <i class="fas fa-mug-hot"></i>
+                    </div>
+                    <h3>Phire Aye Latte</h3>
+                    <p>Cold brew that brings you back for more</p>
+                    <div class="menu-price">₹220</div>
+                    <div class="menu-song">♪ Phire Aye Chole Aye</div>
+                </div>
+                <div class="menu-card">
+                    <div class="menu-image">
+                        <i class="fas fa-glass-whiskey"></i>
+                    </div>
+                    <h3>Hemanta Brishti</h3>
+                    <p>Monsoon-inspired iced tea with lemongrass</p>
+                    <div class="menu-price">₹150</div>
+                    <div class="menu-song">♪ Autumn Rains Collection</div>
+                </div>
+                <div class="menu-card">
+                    <div class="menu-image">
+                        <i class="fas fa-cocktail"></i>
+                    </div>
+                    <h3>Madhur Dhwani</h3>
+                    <p>Sweet harmony latte with vanilla & cardamom</p>
+                    <div class="menu-price">₹200</div>
+                    <div class="menu-song">♪ Madhur Dhwani Bajao</div>
+                </div>
+            </div>
+            <div class="text-center">
+                <button class="btn-primary" onclick="document.getElementById('loginBtn').click()">View Full Menu</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spaces Section -->
+    <section id="spaces" class="spaces-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Our Spaces</h2>
+                <p class="section-subtitle">Book your perfect spot for meetings, performances, or exhibitions</p>
+                <div class="title-underline"></div>
+            </div>
+            <div class="spaces-grid">
+                <div class="space-card">
+                    <div class="space-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Meeting Zone</h3>
+                    <p>Professional pods and rooms for 2-10 people</p>
+                    <ul class="space-features">
+                        <li><i class="fas fa-check"></i> High-speed WiFi</li>
+                        <li><i class="fas fa-check"></i> Projector & Whiteboard</li>
+                        <li><i class="fas fa-check"></i> Complimentary Refreshments</li>
+                    </ul>
+                    <div class="space-price">From ₹200/hour</div>
+                    <button class="btn-secondary" onclick="document.getElementById('loginBtn').click()">Book Now</button>
+                </div>
+                <div class="space-card featured">
+                    <div class="featured-badge">Most Popular</div>
+                    <div class="space-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <h3>Performance Zone</h3>
+                    <p>Intimate stage for concerts, open mics, and launches</p>
+                    <ul class="space-features">
+                        <li><i class="fas fa-check"></i> Professional Audio</li>
+                        <li><i class="fas fa-check"></i> Lighting Setup</li>
+                        <li><i class="fas fa-check"></i> Recording Available</li>
+                        <li><i class="fas fa-check"></i> 50-80 Capacity</li>
+                    </ul>
+                    <div class="space-price">From ₹1,500/hour</div>
+                    <button class="btn-primary" onclick="document.getElementById('loginBtn').click()">Book Performance</button>
+                </div>
+                <div class="space-card">
+                    <div class="space-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3>Exhibition Space</h3>
+                    <p>Outdoor gallery for artists and photographers</p>
+                    <ul class="space-features">
+                        <li><i class="fas fa-check"></i> 2-Week Slots</li>
+                        <li><i class="fas fa-check"></i> Opening Night Event</li>
+                        <li><i class="fas fa-check"></i> Marketing Support</li>
+                    </ul>
+                    <div class="space-price">Apply to Exhibit</div>
+                    <button class="btn-secondary" onclick="document.getElementById('loginBtn').click()">Submit Portfolio</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gamification Preview -->
+    <section class="gamification-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Join the Sangeet Sabha</h2>
+                <p class="section-subtitle">Earn Swar Points, unlock badges, and rise through the tiers</p>
+                <div class="title-underline"></div>
+            </div>
+            <div class="gamification-content">
+                <div class="tier-showcase">
+                    <div class="tier-card">
+                        <div class="tier-icon bronze"><i class="fas fa-music"></i></div>
+                        <h4>Shrotā</h4>
+                        <p>Listener</p>
+                    </div>
+                    <div class="tier-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="tier-card">
+                        <div class="tier-icon silver"><i class="fas fa-star"></i></div>
+                        <h4>Rasik</h4>
+                        <p>Connoisseur</p>
+                    </div>
+                    <div class="tier-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="tier-card">
+                        <div class="tier-icon gold"><i class="fas fa-crown"></i></div>
+                        <h4>Kalakar</h4>
+                        <p>Artist</p>
+                    </div>
+                    <div class="tier-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="tier-card">
+                        <div class="tier-icon platinum"><i class="fas fa-gem"></i></div>
+                        <h4>Guru</h4>
+                        <p>Master</p>
+                    </div>
+                    <div class="tier-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="tier-card">
+                        <div class="tier-icon legend"><i class="fas fa-trophy"></i></div>
+                        <h4>Legend</h4>
+                        <p>Ultimate</p>
+                    </div>
+                </div>
+                <div class="rewards-preview">
+                    <div class="reward-item">
+                        <i class="fas fa-coffee"></i>
+                        <span>Free coffee at 1000 points</span>
+                    </div>
+                    <div class="reward-item">
+                        <i class="fas fa-birthday-cake"></i>
+                        <span>Birthday special discount</span>
+                    </div>
+                    <div class="reward-item">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span>Priority event access</span>
+                    </div>
+                    <div class="reward-item">
+                        <i class="fas fa-percentage"></i>
+                        <span>Up to 20% permanent discount</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section id="events" class="events-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Upcoming Events</h2>
+                <div class="title-underline"></div>
+            </div>
+            <div class="events-grid">
+                <div class="event-card">
+                    <div class="event-date">
+                        <span class="day">22</span>
+                        <span class="month">Nov</span>
+                    </div>
+                    <div class="event-details">
+                        <h3>Rabindra Sangeet Evening</h3>
+                        <p><i class="fas fa-clock"></i> 7:00 PM - 9:00 PM</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Performance Zone</p>
+                        <span class="event-badge">Live Music</span>
+                    </div>
+                </div>
+                <div class="event-card">
+                    <div class="event-date">
+                        <span class="day">25</span>
+                        <span class="month">Nov</span>
+                    </div>
+                    <div class="event-details">
+                        <h3>Golden Era Quiz Night</h3>
+                        <p><i class="fas fa-clock"></i> 6:00 PM - 8:00 PM</p>
+                        <p><i class="fas fa-trophy"></i> Win 500 Swar Points</p>
+                        <span class="event-badge">Competition</span>
+                    </div>
+                </div>
+                <div class="event-card">
+                    <div class="event-date">
+                        <span class="day">28</span>
+                        <span class="month">Nov</span>
+                    </div>
+                    <div class="event-details">
+                        <h3>Film Photography Exhibition</h3>
+                        <p><i class="fas fa-clock"></i> All Day</p>
+                        <p><i class="fas fa-palette"></i> Opening: 5:00 PM</p>
+                        <span class="event-badge">Art</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="gallery-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Gallery</h2>
+                <p class="section-subtitle">#TheGoldenHuesMoment</p>
+                <div class="title-underline"></div>
+            </div>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <i class="fas fa-image"></i>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <i class="fas fa-image"></i>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <i class="fas fa-image"></i>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <i class="fas fa-image"></i>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <i class="fas fa-image"></i>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <i class="fas fa-image"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>The Golden Hues</h3>
+                    <p class="tagline">Sudhin</p>
+                    <p>Celebrating Bengal's Golden Era, one cup at a time.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#menu">Menu</a></li>
+                        <li><a href="#spaces">Book Spaces</a></li>
+                        <li><a href="#events">Events</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> Park Street, Kolkata</p>
+                    <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+                    <p><i class="fas fa-envelope"></i> hello@thegoldenhues.in</p>
+                    <p><i class="fas fa-clock"></i> 8:00 AM - 11:00 PM</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Newsletter</h4>
+                    <p>Get updates on events and exclusive offers</p>
+                    <div class="newsletter-form">
+                        <input type="email" placeholder="Your email">
+                        <button><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 The Golden Hues. All rights reserved. | Jai Bangla. Jai Sangeet.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Select Your Portal</h2>
+            <div class="persona-grid">
+                <div class="persona-card" onclick="window.location.href='customer.html'">
+                    <div class="persona-icon"><i class="fas fa-user"></i></div>
+                    <h3>Customer</h3>
+                    <p>Browse, Book, Earn rewards</p>
+                </div>
+                <div class="persona-card" onclick="window.location.href='admin.html'">
+                    <div class="persona-icon"><i class="fas fa-user-shield"></i></div>
+                    <h3>Admin</h3>
+                    <p>Dashboard, analytics</p>
+                </div>
+                <div class="persona-card" onclick="window.location.href='artist.html'">
+                    <div class="persona-icon"><i class="fas fa-microphone-alt"></i></div>
+                    <h3>Performer</h3>
+                    <p>Book performances</p>
+                </div>
+                <div class="persona-card" onclick="window.location.href='curator.html'">
+                    <div class="persona-icon"><i class="fas fa-paint-brush"></i></div>
+                    <h3>Curator</h3>
+                    <p>Submit exhibitions, manage artworks</p>
+                </div>
+                <div class="persona-card" onclick="window.location.href='staff.html'">
+                    <div class="persona-icon"><i class="fas fa-concierge-bell"></i></div>
+                    <h3>Staff</h3>
+                    <p>Order management, check-ins</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
