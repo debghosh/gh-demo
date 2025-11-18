@@ -10,16 +10,53 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif; }
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            overflow-x: hidden;
+        }
         .portal-card { transition: all 0.3s ease; }
         .portal-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        
+        /* Mobile sidebar overlay */
+        .mobile-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+            display: none;
+        }
+        .mobile-overlay.active {
+            display: block;
+        }
+        
+        /* Responsive sidebar */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                height: 100vh;
+                z-index: 50;
+                transition: left 0.3s ease;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+        }
+        
+        /* Prevent horizontal scroll */
+        * {
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useEffect } = React;
         
         // Sample Data
         const SAMPLE_DATA = {
@@ -38,14 +75,14 @@
             }
         };
 
-        // Icon components (simplified)
+        // Icon components
         const Icon = ({ name, className = "w-5 h-5" }) => {
             const icons = {
                 home: "🏠", user: "👤", coffee: "☕", calendar: "📅", music: "🎵",
                 star: "⭐", award: "🏆", book: "📚", camera: "📸", settings: "⚙️",
                 users: "👥", dollar: "💰", package: "📦", chart: "📊", mic: "🎤",
                 message: "💬", file: "📄", image: "🖼️", trending: "📈", clock: "🕒",
-                handshake: "🤝", truck: "🚚", megaphone: "📣", contract: "📝"  // NEW LINE
+                menu: "☰", close: "✕", truck: "🚚", contract: "📝", handshake: "🤝"
             };
             return <span className={className}>{icons[name] || "•"}</span>;
         };
@@ -53,6 +90,16 @@
         // Main App
         function App() {
             const [currentPortal, setCurrentPortal] = useState('landing');
+            const [isMobile, setIsMobile] = useState(false);
+
+            useEffect(() => {
+                const checkMobile = () => {
+                    setIsMobile(window.innerWidth < 768);
+                };
+                checkMobile();
+                window.addEventListener('resize', checkMobile);
+                return () => window.removeEventListener('resize', checkMobile);
+            }, []);
 
             const portals = [
                 { id: 'customer', name: 'Customer Portal', icon: 'user', color: 'bg-amber-500' },
@@ -60,7 +107,7 @@
                 { id: 'performer', name: 'Performer Portal', icon: 'mic', color: 'bg-purple-500' },
                 { id: 'staff', name: 'Staff Portal', icon: 'coffee', color: 'bg-green-500' },
                 { id: 'curator', name: 'Curator Portal', icon: 'image', color: 'bg-pink-500' },
-                { id: 'partner', name: 'Partner Portal', icon: 'users', color: 'bg-indigo-500' }  // NEW LINE
+                { id: 'partner', name: 'Partner Portal', icon: 'handshake', color: 'bg-indigo-500' }
             ];
 
             if (currentPortal === 'landing') {
@@ -69,26 +116,37 @@
 
             return (
                 <div className="flex flex-col h-screen bg-gray-50">
-                    <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-                        <div className="flex items-center space-x-4">
-                            <button onClick={() => setCurrentPortal('landing')} className="flex items-center space-x-2 hover:bg-gray-100 px-3 py-2 rounded-lg">
-                                <Icon name="home" />
-                                <span className="font-semibold text-gray-700">The Golden Hues</span>
+                    {/* Top Navigation Bar */}
+                    <div className="h-14 md:h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6 flex-shrink-0">
+                        <div className="flex items-center space-x-2 md:space-x-4">
+                            <button 
+                                onClick={() => setCurrentPortal('landing')} 
+                                className="flex items-center space-x-2 hover:bg-gray-100 px-2 md:px-3 py-2 rounded-lg"
+                            >
+                                <Icon name="home" className="text-lg md:text-xl" />
+                                <span className="font-semibold text-gray-700 text-sm md:text-base">The Golden Hues</span>
                             </button>
-                            <span className="text-gray-400">→</span>
-                            <span className="text-gray-600">{portals.find(p => p.id === currentPortal)?.name}</span>
+                            <span className="text-gray-400 hidden md:inline">→</span>
+                            <span className="text-gray-600 text-xs md:text-base truncate max-w-[150px] md:max-w-none">
+                                {portals.find(p => p.id === currentPortal)?.name}
+                            </span>
                         </div>
-                        <button onClick={() => setCurrentPortal('landing')} className="text-gray-600 hover:text-gray-900">
-                            <span className="text-xl">←</span> Back
+                        <button 
+                            onClick={() => setCurrentPortal('landing')} 
+                            className="text-gray-600 hover:text-gray-900 text-sm md:text-base"
+                        >
+                            <span className="text-xl">←</span> <span className="hidden md:inline">Back</span>
                         </button>
                     </div>
+                    
+                    {/* Main Content */}
                     <div className="flex-1 overflow-auto">
-                        {currentPortal === 'customer' && <CustomerPortal />}
-                        {currentPortal === 'admin' && <AdminPortal />}
-                        {currentPortal === 'performer' && <PerformerPortal />}
-                        {currentPortal === 'staff' && <StaffPortal />}
-                        {currentPortal === 'curator' && <CuratorPortal />}
-                        {currentPortal === 'partner' && <PartnerPortal />}  // NEW LINE
+                        {currentPortal === 'customer' && <CustomerPortal isMobile={isMobile} />}
+                        {currentPortal === 'admin' && <AdminPortal isMobile={isMobile} />}
+                        {currentPortal === 'performer' && <PerformerPortal isMobile={isMobile} />}
+                        {currentPortal === 'staff' && <StaffPortal isMobile={isMobile} />}
+                        {currentPortal === 'curator' && <CuratorPortal isMobile={isMobile} />}
+                        {currentPortal === 'partner' && <PartnerPortal isMobile={isMobile} />}
                     </div>
                 </div>
             );
@@ -97,26 +155,26 @@
         // Landing Page
         function LandingPage({ portals, onSelectPortal }) {
             return (
-                <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
-                    <div className="container mx-auto px-6 py-16">
-                        <div className="text-center mb-12">
-                            <h1 className="text-6xl font-bold text-gray-800 mb-4">The Golden Hues</h1>
-                            <p className="text-2xl text-gray-600 mb-2">Sudhin Dasgupta Tribute Cafe</p>
-                            <p className="text-lg text-gray-500">Digital Portal System - Select Your Role</p>
+                <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 p-4 md:p-6">
+                    <div className="container mx-auto px-2 md:px-6 py-8 md:py-16">
+                        <div className="text-center mb-8 md:mb-12">
+                            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-2 md:mb-4">The Golden Hues</h1>
+                            <p className="text-lg md:text-xl lg:text-2xl text-gray-600 mb-1 md:mb-2">Sudhin Dasgupta Tribute Cafe</p>
+                            <p className="text-sm md:text-base lg:text-lg text-gray-500">Digital Portal System - Select Your Role</p>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 max-w-6xl mx-auto">
                             {portals.map(portal => (
                                 <button
                                     key={portal.id}
                                     onClick={() => onSelectPortal(portal.id)}
-                                    className="portal-card bg-white rounded-2xl p-10 shadow-lg text-center"
+                                    className="portal-card bg-white rounded-xl md:rounded-2xl p-6 md:p-8 lg:p-10 shadow-lg text-center"
                                 >
-                                    <div className={`w-20 h-20 ${portal.color} rounded-full flex items-center justify-center text-4xl mb-6 mx-auto`}>
-                                        <Icon name={portal.icon} className="text-3xl" />
+                                    <div className={`w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 ${portal.color} rounded-full flex items-center justify-center text-2xl md:text-3xl lg:text-4xl mb-4 md:mb-6 mx-auto`}>
+                                        <Icon name={portal.icon} className="text-xl md:text-2xl lg:text-3xl" />
                                     </div>
-                                    <h3 className="text-2xl font-semibold text-gray-800 mb-3">{portal.name}</h3>
-                                    <p className="text-gray-600">Access your personalized dashboard</p>
+                                    <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-800 mb-2 md:mb-3">{portal.name}</h3>
+                                    <p className="text-sm md:text-base text-gray-600">Access your personalized dashboard</p>
                                 </button>
                             ))}
                         </div>
@@ -125,9 +183,10 @@
             );
         }
 
-        // Customer Portal
-        function CustomerPortal() {
+        // Customer Portal with Mobile Support
+        function CustomerPortal({ isMobile }) {
             const [activeTab, setActiveTab] = useState('dashboard');
+            const [sidebarOpen, setSidebarOpen] = useState(false);
             
             const tabs = [
                 { id: 'dashboard', name: 'Dashboard', icon: 'home' },
@@ -140,16 +199,37 @@
                 { id: 'profile', name: 'Profile', icon: 'user' }
             ];
 
+            const handleTabClick = (tabId) => {
+                setActiveTab(tabId);
+                if (isMobile) setSidebarOpen(false);
+            };
+
             return (
-                <div className="flex h-full">
-                    <div className="w-64 bg-white border-r border-gray-200">
-                        <div className="p-6">
-                            <div className="text-sm text-gray-500 mb-4">Customer Portal</div>
+                <div className="flex h-full relative">
+                    {/* Mobile Overlay */}
+                    {isMobile && sidebarOpen && (
+                        <div 
+                            className="mobile-overlay active" 
+                            onClick={() => setSidebarOpen(false)}
+                        />
+                    )}
+
+                    {/* Sidebar */}
+                    <div className={`sidebar w-64 bg-white border-r border-gray-200 ${isMobile && sidebarOpen ? 'active' : ''} ${isMobile && !sidebarOpen ? 'hidden' : ''}`}>
+                        <div className="p-4 md:p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="text-sm text-gray-500">Customer Portal</div>
+                                {isMobile && (
+                                    <button onClick={() => setSidebarOpen(false)} className="text-gray-500">
+                                        <Icon name="close" className="text-xl" />
+                                    </button>
+                                )}
+                            </div>
                             <div className="space-y-1">
                                 {tabs.map(tab => (
                                     <button
                                         key={tab.id}
-                                        onClick={() => setActiveTab(tab.id)}
+                                        onClick={() => handleTabClick(tab.id)}
                                         className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg ${
                                             activeTab === tab.id ? 'bg-amber-100 text-amber-900' : 'text-gray-700 hover:bg-gray-100'
                                         }`}
@@ -161,113 +241,136 @@
                             </div>
                         </div>
                     </div>
-                    <div className="flex-1 overflow-auto p-8">
-                        {activeTab === 'dashboard' && <CustomerDashboard />}
-                        {activeTab === 'points' && <EarnPoints />}
-                        {activeTab === 'rewards' && <Rewards />}
-                        {activeTab === 'book' && <BookSpaces />}
-                        {activeTab === 'events' && <Events />}
-                        {activeTab === 'quizzes' && <Quizzes />}
-                        {activeTab === 'gallery' && <Gallery />}
-                        {activeTab === 'profile' && <ProfilePage />}
+
+                    {/* Main Content */}
+                    <div className="flex-1 overflow-auto">
+                        {/* Mobile Menu Button */}
+                        {isMobile && !sidebarOpen && (
+                            <button
+                                onClick={() => setSidebarOpen(true)}
+                                className="fixed bottom-4 right-4 bg-amber-500 text-white p-4 rounded-full shadow-lg z-30"
+                            >
+                                <Icon name="menu" className="text-2xl" />
+                            </button>
+                        )}
+                        
+                        <div className="p-4 md:p-8">
+                            {activeTab === 'dashboard' && <CustomerDashboard isMobile={isMobile} />}
+                            {activeTab === 'points' && <EarnPoints isMobile={isMobile} />}
+                            {activeTab === 'rewards' && <Rewards isMobile={isMobile} />}
+                            {activeTab === 'book' && <BookSpaces isMobile={isMobile} />}
+                            {activeTab === 'events' && <Events isMobile={isMobile} />}
+                            {activeTab === 'quizzes' && <Quizzes isMobile={isMobile} />}
+                            {activeTab === 'gallery' && <Gallery isMobile={isMobile} />}
+                            {activeTab === 'profile' && <ProfilePage isMobile={isMobile} />}
+                        </div>
                     </div>
                 </div>
             );
         }
 
-        // Customer Dashboard
-        function CustomerDashboard() {
+        // Customer Dashboard - Responsive
+        function CustomerDashboard({ isMobile }) {
             return (
-                <div className="max-w-7xl">
-                    <h1 className="text-4xl font-bold text-gray-800 mb-8">Welcome back, {SAMPLE_DATA.customer.name}! 👋</h1>
+                <div className="max-w-7xl mx-auto">
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-4 md:mb-8">
+                        Welcome back, {SAMPLE_DATA.customer.name}! 👋
+                    </h1>
                     
-                    <div className="grid grid-cols-4 gap-6 mb-8">
-                        <StatCard title="Swar Points" value={SAMPLE_DATA.customer.points.toLocaleString()} subtitle="Available" icon="award" />
-                        <StatCard title="Tier Status" value={SAMPLE_DATA.customer.tier} subtitle="Level 2/5" icon="star" />
-                        <StatCard title="Next Reward" value="550pts away" subtitle="Free Coffee" icon="coffee" />
-                        <StatCard title="Birthday" value="15 days" subtitle="Special discount!" icon="calendar" />
+                    {/* Stats Grid - Responsive */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
+                        <StatCard title="Swar Points" value={SAMPLE_DATA.customer.points.toLocaleString()} subtitle="Available" icon="award" isMobile={isMobile} />
+                        <StatCard title="Tier Status" value={SAMPLE_DATA.customer.tier} subtitle="Level 2/5" icon="star" isMobile={isMobile} />
+                        <StatCard title="Next Reward" value="550pts" subtitle="Free Coffee" icon="coffee" isMobile={isMobile} />
+                        <StatCard title="Birthday" value="15 days" subtitle="Special discount!" icon="calendar" isMobile={isMobile} />
                     </div>
 
-                    <div className="grid grid-cols-3 gap-6 mb-8">
-                        <div className="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+                    {/* Three Column Layout - Stack on Mobile */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+                        {/* Recent Activity */}
+                        <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
+                            <h3 className="text-base md:text-lg font-semibold mb-4">Recent Activity</h3>
                             <div className="space-y-3">
                                 <ActivityItem item="Coffee" points={150} date="Nov 15" />
                                 <ActivityItem item="Quiz" points={50} date="Nov 15" />
                                 <ActivityItem item="Check-in" points={10} date="Nov 15" />
                             </div>
-                            <div className="mt-4 text-sm text-gray-600">
+                            <div className="mt-4 text-xs md:text-sm text-gray-600">
                                 <div>Last Visit: Nov 15</div>
                                 <div>Total Visits: {SAMPLE_DATA.customer.visits}</div>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 className="text-lg font-semibold mb-4">Upcoming Bookings</h3>
+                        {/* Upcoming Bookings */}
+                        <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
+                            <h3 className="text-base md:text-lg font-semibold mb-4">Upcoming Bookings</h3>
                             <div className="space-y-3">
                                 <BookingCard space="Pod 2" date="Nov 20" time="3:00 PM" duration="2 hrs" />
                                 <BookingCard space="Performance Zone" date="Nov 25" time="7:00 PM" duration="3 hrs" />
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-                            <div className="space-y-3">
-                                <button className="w-full bg-amber-500 text-white py-3 rounded-lg hover:bg-amber-600 font-medium">Book Space</button>
-                                <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 font-medium">Order Now</button>
-                                <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 font-medium">Take Quiz</button>
-                                <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 font-medium">View Events</button>
+                        {/* Quick Actions */}
+                        <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
+                            <h3 className="text-base md:text-lg font-semibold mb-4">Quick Actions</h3>
+                            <div className="space-y-2 md:space-y-3">
+                                <button className="w-full bg-amber-500 text-white py-2 md:py-3 rounded-lg hover:bg-amber-600 font-medium text-sm md:text-base">Book Space</button>
+                                <button className="w-full bg-gray-100 text-gray-700 py-2 md:py-3 rounded-lg hover:bg-gray-200 font-medium text-sm md:text-base">Order Now</button>
+                                <button className="w-full bg-gray-100 text-gray-700 py-2 md:py-3 rounded-lg hover:bg-gray-200 font-medium text-sm md:text-base">Take Quiz</button>
+                                <button className="w-full bg-gray-100 text-gray-700 py-2 md:py-3 rounded-lg hover:bg-gray-200 font-medium text-sm md:text-base">View Events</button>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl p-6 shadow-sm mb-8">
+                    {/* Achievements - Responsive Grid */}
+                    <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm mb-6 md:mb-8">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold">Achievements</h3>
-                            <button className="text-amber-600 text-sm hover:underline">View All →</button>
+                            <h3 className="text-base md:text-lg font-semibold">Achievements</h3>
+                            <button className="text-amber-600 text-xs md:text-sm hover:underline">View All →</button>
                         </div>
-                        <div className="grid grid-cols-6 gap-4">
+                        <div className="grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
                             {['First Sip', '10th Visit', 'Night Owl', 'Quiz Master', 'Show Goer', '+15 more'].map((badge, idx) => (
                                 <div key={idx} className="text-center">
-                                    <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-2xl mb-2 mx-auto">
+                                    <div className="w-12 h-12 md:w-16 md:h-16 bg-amber-100 rounded-full flex items-center justify-center text-lg md:text-2xl mb-2 mx-auto">
                                         {idx < 5 ? '🏆' : '•••'}
                                     </div>
-                                    <div className="text-xs text-gray-600">{badge}</div>
+                                    <div className="text-[10px] md:text-xs text-gray-600">{badge}</div>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-6">
-                        <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-8 text-white">
-                            <h3 className="text-2xl font-semibold mb-2">Today's Special</h3>
-                            <p className="text-xl mb-3">Hemanta Brishti Cold Brew</p>
-                            <div className="flex items-center space-x-3">
-                                <span className="text-3xl font-bold">₹145</span>
-                                <span className="line-through text-amber-200 text-xl">₹180</span>
-                                <span className="bg-white text-amber-600 px-3 py-1 rounded font-semibold">20% OFF</span>
+                    {/* Special Offers - Stack on Mobile */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                        <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-6 md:p-8 text-white">
+                            <h3 className="text-lg md:text-2xl font-semibold mb-2">Today's Special</h3>
+                            <p className="text-base md:text-xl mb-3">Hemanta Brishti Cold Brew</p>
+                            <div className="flex items-center space-x-2 md:space-x-3">
+                                <span className="text-2xl md:text-3xl font-bold">₹145</span>
+                                <span className="line-through text-amber-200 text-lg md:text-xl">₹180</span>
+                                <span className="bg-white text-amber-600 px-2 md:px-3 py-1 rounded text-xs md:text-sm font-semibold">20% OFF</span>
                             </div>
                         </div>
-                        <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-8 text-white">
-                            <h3 className="text-2xl font-semibold mb-3">📸 Share Your Moment</h3>
-                            <p className="mb-4 text-lg">Upload & win ₹2000 cafe credit!</p>
-                            <button className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100">Upload Photo</button>
+                        <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-6 md:p-8 text-white">
+                            <h3 className="text-lg md:text-2xl font-semibold mb-3">📸 Share Your Moment</h3>
+                            <p className="mb-4 text-sm md:text-lg">Upload & win ₹2000 cafe credit!</p>
+                            <button className="bg-white text-purple-600 px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold hover:bg-gray-100 text-sm md:text-base">Upload Photo</button>
                         </div>
                     </div>
                 </div>
             );
         }
 
-        // Reusable Components
-        function StatCard({ title, value, subtitle, icon }) {
+        // Reusable Components - Responsive
+        function StatCard({ title, value, subtitle, icon, isMobile }) {
             return (
-                <div className="bg-white rounded-xl p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-3">
-                        <div className="text-sm text-gray-600">{title}</div>
-                        <Icon name={icon} />
+                <div className="bg-white rounded-xl p-3 md:p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-2 md:mb-3">
+                        <div className="text-xs md:text-sm text-gray-600">{title}</div>
+                        <Icon name={icon} className={isMobile ? "text-base" : "text-lg"} />
                     </div>
-                    <div className="text-3xl font-bold mb-1">{value}</div>
-                    <div className="text-sm text-gray-500">{subtitle}</div>
+                    <div className="text-xl md:text-3xl font-bold mb-1">{value}</div>
+                    <div className="text-xs md:text-sm text-gray-500">{subtitle}</div>
                 </div>
             );
         }
@@ -276,10 +379,10 @@
             return (
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
                     <div>
-                        <div className="font-medium text-sm">{item}</div>
-                        <div className="text-xs text-gray-500">{date}</div>
+                        <div className="font-medium text-xs md:text-sm">{item}</div>
+                        <div className="text-[10px] md:text-xs text-gray-500">{date}</div>
                     </div>
-                    <div className="text-amber-600 font-semibold">+{points} pts</div>
+                    <div className="text-amber-600 font-semibold text-xs md:text-sm">+{points} pts</div>
                 </div>
             );
         }
@@ -287,26 +390,26 @@
         function BookingCard({ space, date, time, duration }) {
             return (
                 <div className="p-3 bg-gray-50 rounded-lg">
-                    <div className="font-medium">{space}</div>
-                    <div className="text-sm text-gray-600">{date}, {time}</div>
-                    <div className="text-xs text-gray-500">{duration}</div>
+                    <div className="font-medium text-sm md:text-base">{space}</div>
+                    <div className="text-xs md:text-sm text-gray-600">{date}, {time}</div>
+                    <div className="text-[10px] md:text-xs text-gray-500">{duration}</div>
                 </div>
             );
         }
 
-        // Other Customer Portal Pages (simplified)
-        function EarnPoints() {
-            return <PlaceholderPage title="Earn Points" description="Point earning methods and progress tracking" />;
+        // Other Pages - Simplified Responsive Versions
+        function EarnPoints({ isMobile }) {
+            return <PlaceholderPage title="Earn Points" description="Point earning methods and progress tracking" isMobile={isMobile} />;
         }
 
-        function Rewards() {
+        function Rewards({ isMobile }) {
             return (
-                <div className="max-w-7xl">
-                    <div className="flex items-center justify-between mb-8">
-                        <h1 className="text-4xl font-bold text-gray-800">Redeem Rewards</h1>
-                        <div className="text-2xl font-bold text-amber-600">Balance: 2,450 pts</div>
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 md:mb-8 space-y-2 md:space-y-0">
+                        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800">Redeem Rewards</h1>
+                        <div className="text-xl md:text-2xl font-bold text-amber-600">Balance: 2,450 pts</div>
                     </div>
-                    <div className="grid grid-cols-4 gap-6">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
                         {[
                             { name: 'Coffee', emoji: '☕', points: 1000, available: true },
                             { name: 'Dessert+Coffee', emoji: '🍰', points: 2000, available: true },
@@ -317,11 +420,11 @@
                             { name: 'Merchandise', emoji: '👕', points: 6000, available: false },
                             { name: 'VIP Event', emoji: '🎫', points: 15000, available: false }
                         ].map((reward, idx) => (
-                            <div key={idx} className="bg-white rounded-xl p-6 shadow-sm text-center">
-                                <div className="text-5xl mb-3">{reward.emoji}</div>
-                                <h3 className="font-semibold mb-2">{reward.name}</h3>
-                                <div className="text-lg font-bold text-amber-600 mb-3">{reward.points} pts</div>
-                                <button className={`w-full py-2 rounded-lg ${reward.available ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-gray-200 text-gray-500'}`}>
+                            <div key={idx} className="bg-white rounded-xl p-4 md:p-6 shadow-sm text-center">
+                                <div className="text-3xl md:text-5xl mb-2 md:mb-3">{reward.emoji}</div>
+                                <h3 className="font-semibold mb-1 md:mb-2 text-sm md:text-base">{reward.name}</h3>
+                                <div className="text-base md:text-lg font-bold text-amber-600 mb-2 md:mb-3">{reward.points} pts</div>
+                                <button className={`w-full py-1.5 md:py-2 rounded-lg text-xs md:text-sm ${reward.available ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-gray-200 text-gray-500'}`}>
                                     {reward.available ? 'Redeem' : 'Locked'}
                                 </button>
                             </div>
@@ -331,36 +434,36 @@
             );
         }
 
-        function BookSpaces() {
-            return <PlaceholderPage title="Book Spaces" description="Meeting and performance zone booking" />;
+        function BookSpaces({ isMobile }) {
+            return <PlaceholderPage title="Book Spaces" description="Meeting and performance zone booking" isMobile={isMobile} />;
         }
 
-        function Events() {
+        function Events({ isMobile }) {
             return (
-                <div className="max-w-7xl">
-                    <h1 className="text-4xl font-bold text-gray-800 mb-8">Upcoming Events</h1>
-                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-10 text-white mb-8">
-                        <div className="text-sm uppercase tracking-wide mb-2">🎵 Featured Event</div>
-                        <h2 className="text-4xl font-bold mb-4">Sudhin Dasgupta Tribute Night</h2>
-                        <div className="flex items-center space-x-6 mb-6 text-xl">
+                <div className="max-w-7xl mx-auto">
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-6 md:mb-8">Upcoming Events</h1>
+                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-6 md:p-10 text-white mb-6 md:mb-8">
+                        <div className="text-xs md:text-sm uppercase tracking-wide mb-2">🎵 Featured Event</div>
+                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4">Sudhin Dasgupta Tribute Night</h2>
+                        <div className="flex flex-wrap items-center gap-2 md:gap-6 mb-4 md:mb-6 text-sm md:text-xl">
                             <span>Nov 22, 2025</span>
-                            <span>|</span>
+                            <span className="hidden md:inline">|</span>
                             <span>7:00 PM</span>
-                            <span>|</span>
+                            <span className="hidden md:inline">|</span>
                             <span>₹500</span>
                         </div>
-                        <p className="text-lg mb-6">Live performances by renowned artists</p>
-                        <button className="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 text-lg">
+                        <p className="text-sm md:text-lg mb-4 md:mb-6">Live performances by renowned artists</p>
+                        <button className="bg-white text-purple-600 px-6 md:px-8 py-2 md:py-3 rounded-lg font-semibold hover:bg-gray-100 text-sm md:text-lg">
                             Register Now
                         </button>
                     </div>
-                    <div className="grid grid-cols-4 gap-6">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
                         {['Open Mic', 'Art Show', 'Coffee Talk', 'Album Launch', 'Poetry', 'Piano', 'Wine & Paint', 'Workshop'].map((event, idx) => (
-                            <div key={idx} className="bg-white rounded-xl p-6 shadow-sm">
-                                <div className="text-4xl mb-3">🎭</div>
-                                <h3 className="font-semibold mb-2">{event}</h3>
-                                <div className="text-sm text-gray-600 mb-3">Nov {18 + idx}, 2025</div>
-                                <button className="w-full bg-amber-500 text-white py-2 rounded-lg hover:bg-amber-600">Register</button>
+                            <div key={idx} className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
+                                <div className="text-3xl md:text-4xl mb-2 md:mb-3">🎭</div>
+                                <h3 className="font-semibold mb-1 md:mb-2 text-sm md:text-base">{event}</h3>
+                                <div className="text-xs md:text-sm text-gray-600 mb-2 md:mb-3">Nov {18 + idx}, 2025</div>
+                                <button className="w-full bg-amber-500 text-white py-1.5 md:py-2 rounded-lg hover:bg-amber-600 text-xs md:text-sm">Register</button>
                             </div>
                         ))}
                     </div>
@@ -368,171 +471,105 @@
             );
         }
 
-        function Quizzes() {
+        function Quizzes({ isMobile }) {
             const [selected, setSelected] = useState(null);
             return (
-                <div className="max-w-7xl">
-                    <div className="flex items-center justify-between mb-8">
-                        <h1 className="text-4xl font-bold text-gray-800">Daily Quiz Challenge 🎵</h1>
-                        <div className="text-xl font-semibold text-amber-600">Streak: 5 days 🔥</div>
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 md:mb-8 space-y-2 md:space-y-0">
+                        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800">Daily Quiz Challenge 🎵</h1>
+                        <div className="text-base md:text-xl font-semibold text-amber-600">Streak: 5 days 🔥</div>
                     </div>
-                    <div className="bg-white rounded-xl p-8 shadow-sm">
-                        <h2 className="text-2xl font-semibold mb-6">Question of the Day</h2>
-                        <p className="text-lg mb-6">In which film did Sudhin Dasgupta compose "Ei Poth Jodi Na Shesh Hoy"?</p>
-                        <div className="space-y-3 mb-6">
+                    <div className="bg-white rounded-xl p-4 md:p-8 shadow-sm">
+                        <h2 className="text-lg md:text-2xl font-semibold mb-4 md:mb-6">Question of the Day</h2>
+                        <p className="text-sm md:text-lg mb-4 md:mb-6">In which film did Sudhin Dasgupta compose "Ei Poth Jodi Na Shesh Hoy"?</p>
+                        <div className="space-y-2 md:space-y-3 mb-4 md:mb-6">
                             {['Saptapadi (1961)', 'Harano Sur (1957)', 'Bilet Pherat (1956)', 'Sare Chuattor (1953)'].map((answer, idx) => (
                                 <button
                                     key={idx}
                                     onClick={() => setSelected(idx)}
-                                    className={`w-full text-left p-4 rounded-lg border-2 ${selected === idx ? 'border-amber-500 bg-amber-50' : 'border-gray-200'}`}
+                                    className={`w-full text-left p-3 md:p-4 rounded-lg border-2 text-sm md:text-base ${selected === idx ? 'border-amber-500 bg-amber-50' : 'border-gray-200'}`}
                                 >
                                     <span className="font-medium">{String.fromCharCode(65 + idx)})</span> {answer}
                                 </button>
                             ))}
                         </div>
-                        <button className="w-full bg-amber-500 text-white py-4 rounded-lg hover:bg-amber-600 font-semibold text-lg">Submit Answer</button>
+                        <button className="w-full bg-amber-500 text-white py-3 md:py-4 rounded-lg hover:bg-amber-600 font-semibold text-base md:text-lg">Submit Answer</button>
                     </div>
                 </div>
             );
         }
 
-        function Gallery() {
-            return <PlaceholderPage title="Community Gallery 📸" description="Browse and upload photos" />;
+        function Gallery({ isMobile }) {
+            return <PlaceholderPage title="Community Gallery 📸" description="Browse and upload photos" isMobile={isMobile} />;
         }
 
-        function ProfilePage() {
-            return <PlaceholderPage title="Your Profile" description="Account information and loyalty status" />;
+        function ProfilePage({ isMobile }) {
+            return <PlaceholderPage title="Your Profile" description="Account information and loyalty status" isMobile={isMobile} />;
         }
 
-        // Admin Portal
-        function AdminPortal() {
-            const [activeTab, setActiveTab] = useState('overview');
-            const tabs = [
-                { id: 'overview', name: 'Overview', icon: 'home' },
-                { id: 'customers', name: 'Customers', icon: 'users' },
-                { id: 'bookings', name: 'Bookings', icon: 'calendar' },
-                { id: 'events', name: 'Events', icon: 'music' },
-                { id: 'finance', name: 'Finance', icon: 'dollar' },
-                { id: 'inventory', name: 'Inventory', icon: 'package' },
-                { id: 'staff', name: 'Staff', icon: 'users' },
-                { id: 'analytics', name: 'Analytics', icon: 'chart' },
-                { id: 'settings', name: 'Settings', icon: 'settings' }
-            ];
-
-            return (
-                <div className="flex h-full">
-                    <div className="w-64 bg-white border-r border-gray-200">
-                        <div className="p-6">
-                            <div className="text-sm text-gray-500 mb-4">Admin Portal</div>
-                            <div className="space-y-1">
-                                {tabs.map(tab => (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => setActiveTab(tab.id)}
-                                        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg ${activeTab === tab.id ? 'bg-blue-100 text-blue-900' : 'text-gray-700 hover:bg-gray-100'}`}
-                                    >
-                                        <Icon name={tab.icon} />
-                                        <span className="font-medium">{tab.name}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex-1 overflow-auto p-8">
-                        {activeTab === 'overview' && <AdminOverview />}
-                        {activeTab !== 'overview' && <PlaceholderPage title={tabs.find(t => t.id === activeTab)?.name || 'Admin'} description="Admin management interface" />}
-                    </div>
-                </div>
-            );
-        }
-
-        function AdminOverview() {
-            return (
-                <div className="max-w-7xl">
-                    <h1 className="text-4xl font-bold text-gray-800 mb-8">Admin Dashboard</h1>
-                    <div className="grid grid-cols-4 gap-6 mb-8">
-                        <StatCard title="Today's Revenue" value={`₹${SAMPLE_DATA.stats.todayRevenue.toLocaleString()}`} subtitle="↑ 12%" icon="dollar" />
-                        <StatCard title="Week Bookings" value={SAMPLE_DATA.stats.weekBookings} subtitle="↑ 8%" icon="calendar" />
-                        <StatCard title="New Members" value={SAMPLE_DATA.stats.monthMembers} subtitle="↑ 23%" icon="users" />
-                        <StatCard title="Active Users" value={SAMPLE_DATA.stats.activeUsers} subtitle="Capacity: 80" icon="users" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-6">
-                        <div className="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 className="text-lg font-semibold mb-4">Live Space Occupancy</h3>
-                            <div className="space-y-2">
-                                <div className="p-3 bg-red-50 rounded-lg flex items-center justify-between">
-                                    <span className="font-medium">Pod 1</span>
-                                    <span className="text-sm text-red-600 font-semibold">OCCUPIED</span>
-                                </div>
-                                <div className="p-3 bg-green-50 rounded-lg flex items-center justify-between">
-                                    <span className="font-medium">Pod 2</span>
-                                    <span className="text-sm text-green-600 font-semibold">AVAILABLE</span>
-                                </div>
-                                <div className="p-3 bg-red-50 rounded-lg flex items-center justify-between">
-                                    <span className="font-medium">Room A</span>
-                                    <span className="text-sm text-red-600 font-semibold">OCCUPIED</span>
-                                </div>
-                                <div className="p-3 bg-green-50 rounded-lg flex items-center justify-between">
-                                    <span className="font-medium">Room B</span>
-                                    <span className="text-sm text-green-600 font-semibold">AVAILABLE</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 className="text-lg font-semibold mb-4">Pending Actions</h3>
-                            <div className="space-y-3">
-                                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                                    <div className="text-sm font-semibold text-amber-800">⚠️ 3 Booking Requests</div>
-                                    <button className="text-amber-600 text-xs hover:underline mt-1">Review Now</button>
-                                </div>
-                                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                                    <div className="text-sm font-semibold text-red-800">⚠️ 5 Pending Refunds</div>
-                                    <button className="text-red-600 text-xs hover:underline mt-1">Process</button>
-                                </div>
-                                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                                    <div className="text-sm font-semibold text-green-800">✅ 12 Completed Tasks</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
+        // Admin Portal - Uses Generic Template
+        function AdminPortal({ isMobile }) {
+            return <PortalTemplate name="Admin" color="blue" tabs={['overview', 'customers', 'bookings', 'events', 'finance', 'inventory', 'staff', 'analytics', 'settings']} isMobile={isMobile} />;
         }
 
         // Performer Portal
-        function PerformerPortal() {
-            return <PortalTemplate name="Performer" color="purple" tabs={['dashboard', 'bookings', 'payments', 'analytics', 'media', 'profile']} />;
+        function PerformerPortal({ isMobile }) {
+            return <PortalTemplate name="Performer" color="purple" tabs={['dashboard', 'bookings', 'payments', 'analytics', 'media', 'profile']} isMobile={isMobile} />;
         }
 
         // Staff Portal
-        function StaffPortal() {
-            return <PortalTemplate name="Staff" color="green" tabs={['dashboard', 'tasks', 'customers', 'orders', 'schedule', 'messages', 'profile']} />;
+        function StaffPortal({ isMobile }) {
+            return <PortalTemplate name="Staff" color="green" tabs={['dashboard', 'tasks', 'customers', 'orders', 'schedule', 'messages', 'profile']} isMobile={isMobile} />;
         }
 
         // Curator Portal
-        function CuratorPortal() {
-            return <PortalTemplate name="Curator" color="pink" tabs={['dashboard', 'exhibitions', 'artists', 'schedule', 'sales', 'gallery', 'applications', 'profile']} />;
+        function CuratorPortal({ isMobile }) {
+            return <PortalTemplate name="Curator" color="pink" tabs={['dashboard', 'exhibitions', 'artists', 'schedule', 'sales', 'gallery', 'applications', 'profile']} isMobile={isMobile} />;
         }
 
-        // Generic Portal Template
-        function PortalTemplate({ name, color, tabs }) {
+        // Generic Portal Template - Responsive
+        function PortalTemplate({ name, color, tabs, isMobile }) {
             const [activeTab, setActiveTab] = useState('dashboard');
+            const [sidebarOpen, setSidebarOpen] = useState(false);
+            
             const colorClasses = {
                 purple: 'bg-purple-100 text-purple-900',
                 green: 'bg-green-100 text-green-900',
-                pink: 'bg-pink-100 text-pink-900'
+                pink: 'bg-pink-100 text-pink-900',
+                blue: 'bg-blue-100 text-blue-900'
+            };
+
+            const handleTabClick = (tab) => {
+                setActiveTab(tab);
+                if (isMobile) setSidebarOpen(false);
             };
 
             return (
-                <div className="flex h-full">
-                    <div className="w-64 bg-white border-r border-gray-200">
-                        <div className="p-6">
-                            <div className="text-sm text-gray-500 mb-4">{name} Portal</div>
+                <div className="flex h-full relative">
+                    {/* Mobile Overlay */}
+                    {isMobile && sidebarOpen && (
+                        <div 
+                            className="mobile-overlay active" 
+                            onClick={() => setSidebarOpen(false)}
+                        />
+                    )}
+
+                    {/* Sidebar */}
+                    <div className={`sidebar w-64 bg-white border-r border-gray-200 ${isMobile && sidebarOpen ? 'active' : ''} ${isMobile && !sidebarOpen ? 'hidden' : ''}`}>
+                        <div className="p-4 md:p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="text-sm text-gray-500">{name} Portal</div>
+                                {isMobile && (
+                                    <button onClick={() => setSidebarOpen(false)} className="text-gray-500">
+                                        <Icon name="close" className="text-xl" />
+                                    </button>
+                                )}
+                            </div>
                             <div className="space-y-1">
                                 {tabs.map(tab => (
                                     <button
                                         key={tab}
-                                        onClick={() => setActiveTab(tab)}
+                                        onClick={() => handleTabClick(tab)}
                                         className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg capitalize ${activeTab === tab ? colorClasses[color] : 'text-gray-700 hover:bg-gray-100'}`}
                                     >
                                         <Icon name={tab === 'dashboard' ? 'home' : tab.substring(0, 4)} />
@@ -542,625 +579,620 @@
                             </div>
                         </div>
                     </div>
-                    <div className="flex-1 overflow-auto p-8">
-                        <PlaceholderPage title={`${name} ${activeTab}`} description={`${name} portal ${activeTab} interface`} />
-                    </div>
-                </div>
-            );
-        }
 
-        // Placeholder Component
-        function PlaceholderPage({ title, description }) {
-            return (
-                <div className="max-w-7xl">
-                    <h1 className="text-4xl font-bold text-gray-800 mb-8">{title}</h1>
-                    <div className="bg-white rounded-xl p-16 shadow-sm text-center">
-                        <div className="text-6xl mb-6">🎨</div>
-                        <p className="text-xl text-gray-600 mb-4">{description}</p>
-                        <p className="text-gray-500">Full interface would be displayed here</p>
-                    </div>
-                </div>
-            );
-        }
-        // PARTNER PORTAL
-function PartnerPortal() {
-    const [activeTab, setActiveTab] = useState('dashboard');
-    
-    const tabs = [
-        { id: 'dashboard', name: 'Dashboard', icon: 'home' },
-        { id: 'orders', name: 'Orders & Supplies', icon: 'truck' },
-        { id: 'invoices', name: 'Invoices', icon: 'dollar' },
-        { id: 'contracts', name: 'Contracts', icon: 'contract' },
-        { id: 'performance', name: 'Performance', icon: 'chart' },
-        { id: 'communications', name: 'Communications', icon: 'message' },
-        { id: 'opportunities', name: 'Opportunities', icon: 'star' },
-        { id: 'profile', name: 'Profile', icon: 'user' }
-    ];
-
-    return (
-        <div className="flex h-full">
-            <div className="w-64 bg-white border-r border-gray-200 overflow-y-auto">
-                <div className="p-6">
-                    <div className="text-sm text-gray-500 mb-4">Partner Portal</div>
-                    <div className="space-y-1">
-                        {tabs.map(tab => (
+                    {/* Main Content */}
+                    <div className="flex-1 overflow-auto">
+                        {/* Mobile Menu Button */}
+                        {isMobile && !sidebarOpen && (
                             <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
-                                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                                    activeTab === tab.id 
-                                        ? 'bg-indigo-100 text-indigo-900' 
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                }`}
+                                onClick={() => setSidebarOpen(true)}
+                                className={`fixed bottom-4 right-4 ${color.replace('100', '500')} text-white p-4 rounded-full shadow-lg z-30`}
                             >
-                                <Icon name={tab.icon} />
-                                <span className="font-medium">{tab.name}</span>
+                                <Icon name="menu" className="text-2xl" />
                             </button>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-8">
-                {activeTab === 'dashboard' && <PartnerDashboard />}
-                {activeTab === 'orders' && <PartnerOrders />}
-                {activeTab === 'invoices' && <PartnerInvoices />}
-                {activeTab === 'contracts' && <PartnerContracts />}
-                {activeTab === 'performance' && <PartnerPerformance />}
-                {activeTab === 'communications' && <PartnerCommunications />}
-                {activeTab === 'opportunities' && <PartnerOpportunities />}
-                {activeTab === 'profile' && <PartnerProfile />}
-            </div>
-        </div>
-    );
-}
-
-// Partner Dashboard
-function PartnerDashboard() {
-    return (
-        <div className="max-w-7xl">
-            <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">Welcome, Karnataka Coffee Suppliers! 🤝</h1>
-                <div className="text-sm text-gray-600">Partner ID: PART-2025-042</div>
-            </div>
-
-            {/* Top Stats */}
-            <div className="grid grid-cols-4 gap-6 mb-8">
-                <StatCard title="Total Orders (Month)" value="24" subtitle="↑ 15%" icon="truck" />
-                <StatCard title="Outstanding Amount" value="₹45,200" subtitle="Due: Nov 30" icon="dollar" />
-                <StatCard title="Active Products" value="12" subtitle="In catalog" icon="package" />
-                <StatCard title="Partner Rating" value="4.8/5.0" subtitle="⭐⭐⭐⭐⭐" icon="star" />
-            </div>
-
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-3 gap-6 mb-8">
-                {/* Recent Orders */}
-                <div className="col-span-2 bg-white rounded-xl p-6 shadow-sm">
-                    <h3 className="text-lg font-semibold mb-4">Recent Orders</h3>
-                    <div className="space-y-3">
-                        <OrderRow 
-                            orderId="ORD-1245" 
-                            items="Coffee Beans (Arabica) - 10kg" 
-                            amount="₹12,500" 
-                            status="Delivered" 
-                            date="Nov 15" 
-                            statusColor="green" 
-                        />
-                        <OrderRow 
-                            orderId="ORD-1232" 
-                            items="Coffee Beans (Robusta) - 5kg" 
-                            amount="₹5,200" 
-                            status="In Transit" 
-                            date="Nov 16" 
-                            statusColor="blue" 
-                        />
-                        <OrderRow 
-                            orderId="ORD-1228" 
-                            items="Coffee Beans (Arabica) - 8kg" 
-                            amount="₹10,000" 
-                            status="Processing" 
-                            date="Nov 17" 
-                            statusColor="amber" 
-                        />
-                        <OrderRow 
-                            orderId="ORD-1220" 
-                            items="Sample Pack - Mixed Beans" 
-                            amount="₹2,500" 
-                            status="Pending" 
-                            date="Nov 17" 
-                            statusColor="gray" 
-                        />
-                    </div>
-                    <button className="text-indigo-600 text-sm mt-4 hover:underline">View All Orders →</button>
-                </div>
-
-                {/* Quick Actions */}
-                <div className="bg-white rounded-xl p-6 shadow-sm">
-                    <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-                    <div className="space-y-3">
-                        <button className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 font-medium">
-                            Submit Invoice
-                        </button>
-                        <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 font-medium">
-                            View Catalog
-                        </button>
-                        <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 font-medium">
-                            Download Reports
-                        </button>
-                        <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 font-medium">
-                            Contact Support
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Pending Actions */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-8">
-                <h3 className="font-semibold text-amber-900 mb-4">⚠️ Pending Actions (3)</h3>
-                <div className="grid grid-cols-3 gap-4">
-                    <div className="p-4 bg-white rounded-lg">
-                        <div className="text-sm font-semibold mb-1">Invoice Approval Needed</div>
-                        <div className="text-xs text-gray-600 mb-2">Invoice #INV-789 - ₹12,500</div>
-                        <button className="text-amber-600 text-xs hover:underline">Review Now →</button>
-                    </div>
-                    <div className="p-4 bg-white rounded-lg">
-                        <div className="text-sm font-semibold mb-1">Contract Renewal</div>
-                        <div className="text-xs text-gray-600 mb-2">Expires: Dec 31, 2025</div>
-                        <button className="text-amber-600 text-xs hover:underline">Review Contract →</button>
-                    </div>
-                    <div className="p-4 bg-white rounded-lg">
-                        <div className="text-sm font-semibold mb-1">Quality Feedback</div>
-                        <div className="text-xs text-gray-600 mb-2">Recent order feedback available</div>
-                        <button className="text-amber-600 text-xs hover:underline">View Feedback →</button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Performance Metrics */}
-            <div className="grid grid-cols-2 gap-6">
-                <div className="bg-white rounded-xl p-6 shadow-sm">
-                    <h3 className="text-lg font-semibold mb-4">Delivery Performance (Last 30 Days)</h3>
-                    <div className="space-y-4">
-                        <div>
-                            <div className="flex justify-between text-sm mb-2">
-                                <span className="text-gray-600">On-Time Delivery</span>
-                                <span className="font-semibold">92%</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div className="bg-green-500 h-2 rounded-full" style={{width: '92%'}}></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div className="flex justify-between text-sm mb-2">
-                                <span className="text-gray-600">Quality Rating</span>
-                                <span className="font-semibold">4.8/5.0</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div className="bg-indigo-500 h-2 rounded-full" style={{width: '96%'}}></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div className="flex justify-between text-sm mb-2">
-                                <span className="text-gray-600">Order Fulfillment</span>
-                                <span className="font-semibold">98%</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div className="bg-blue-500 h-2 rounded-full" style={{width: '98%'}}></div>
-                            </div>
+                        )}
+                        
+                        <div className="p-4 md:p-8">
+                            <PlaceholderPage title={`${name} ${activeTab}`} description={`${name} portal ${activeTab} interface`} isMobile={isMobile} />
                         </div>
                     </div>
                 </div>
+            );
+        }
 
-                <div className="bg-white rounded-xl p-6 shadow-sm">
-                    <h3 className="text-lg font-semibold mb-4">Business Summary (This Month)</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="p-3 bg-gray-50 rounded-lg">
-                            <div className="text-sm text-gray-600 mb-1">Total Revenue</div>
-                            <div className="text-2xl font-bold">₹2,48,500</div>
-                        </div>
-                        <div className="p-3 bg-gray-50 rounded-lg">
-                            <div className="text-sm text-gray-600 mb-1">Avg Order Value</div>
-                            <div className="text-2xl font-bold">₹10,354</div>
-                        </div>
-                        <div className="p-3 bg-gray-50 rounded-lg">
-                            <div className="text-sm text-gray-600 mb-1">Total Orders</div>
-                            <div className="text-2xl font-bold">24</div>
-                        </div>
-                        <div className="p-3 bg-gray-50 rounded-lg">
-                            <div className="text-sm text-gray-600 mb-1">Growth</div>
-                            <div className="text-2xl font-bold text-green-600">+15%</div>
-                        </div>
+        // Placeholder Component - Responsive
+        function PlaceholderPage({ title, description, isMobile }) {
+            return (
+                <div className="max-w-7xl mx-auto">
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-6 md:mb-8">{title}</h1>
+                    <div className="bg-white rounded-xl p-8 md:p-16 shadow-sm text-center">
+                        <div className="text-4xl md:text-6xl mb-4 md:mb-6">🎨</div>
+                        <p className="text-lg md:text-xl text-gray-600 mb-3 md:mb-4">{description}</p>
+                        <p className="text-sm md:text-base text-gray-500">Full interface would be displayed here</p>
                     </div>
                 </div>
-            </div>
-        </div>
-    );
-}
+            );
+        }
 
-// Order Row Component
-function OrderRow({ orderId, items, amount, status, date, statusColor }) {
-    const statusColors = {
-        green: 'bg-green-50 text-green-700',
-        blue: 'bg-blue-50 text-blue-700',
-        amber: 'bg-amber-50 text-amber-700',
-        gray: 'bg-gray-50 text-gray-700'
-    };
-
-    return (
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div className="flex-1">
-                <div className="font-medium mb-1">{orderId}</div>
-                <div className="text-sm text-gray-600">{items}</div>
-                <div className="text-xs text-gray-500 mt-1">{date}</div>
-            </div>
-            <div className="text-right">
-                <div className="font-semibold mb-2">{amount}</div>
-                <span className={`text-xs px-2 py-1 rounded ${statusColors[statusColor]}`}>
-                    {status}
-                </span>
-            </div>
-        </div>
-    );
-}
-
-// Partner Orders
-function PartnerOrders() {
-    return (
-        <div className="max-w-7xl">
-            <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">Orders & Supplies</h1>
-                <button className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700">
-                    Create New Order
-                </button>
-            </div>
-
-            {/* Filter Tabs */}
-            <div className="flex space-x-2 mb-6">
-                <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg">All</button>
-                <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Pending</button>
-                <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Processing</button>
-                <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">In Transit</button>
-                <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Delivered</button>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-                <h3 className="text-lg font-semibold mb-4">Order History</h3>
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="border-b border-gray-200">
-                            <tr>
-                                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Order ID</th>
-                                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Items</th>
-                                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Date</th>
-                                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Amount</th>
-                                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Status</th>
-                                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr className="border-b border-gray-100">
-                                <td className="py-3 px-4 text-sm">ORD-1245</td>
-                                <td className="py-3 px-4 text-sm">Arabica Beans 10kg</td>
-                                <td className="py-3 px-4 text-sm">Nov 15, 2025</td>
-                                <td className="py-3 px-4 text-sm font-semibold">₹12,500</td>
-                                <td className="py-3 px-4">
-                                    <span className="text-xs px-2 py-1 bg-green-50 text-green-700 rounded">Delivered</span>
-                                </td>
-                                <td className="py-3 px-4">
-                                    <button className="text-indigo-600 text-sm hover:underline">View</button>
-                                </td>
-                            </tr>
-                            <tr className="border-b border-gray-100">
-                                <td className="py-3 px-4 text-sm">ORD-1232</td>
-                                <td className="py-3 px-4 text-sm">Robusta Beans 5kg</td>
-                                <td className="py-3 px-4 text-sm">Nov 16, 2025</td>
-                                <td className="py-3 px-4 text-sm font-semibold">₹5,200</td>
-                                <td className="py-3 px-4">
-                                    <span className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded">In Transit</span>
-                                </td>
-                                <td className="py-3 px-4">
-                                    <button className="text-indigo-600 text-sm hover:underline">Track</button>
-                                </td>
-                            </tr>
-                            <tr className="border-b border-gray-100">
-                                <td className="py-3 px-4 text-sm">ORD-1228</td>
-                                <td className="py-3 px-4 text-sm">Arabica Beans 8kg</td>
-                                <td className="py-3 px-4 text-sm">Nov 17, 2025</td>
-                                <td className="py-3 px-4 text-sm font-semibold">₹10,000</td>
-                                <td className="py-3 px-4">
-                                    <span className="text-xs px-2 py-1 bg-amber-50 text-amber-700 rounded">Processing</span>
-                                </td>
-                                <td className="py-3 px-4">
-                                    <button className="text-indigo-600 text-sm hover:underline">Update</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// Partner Invoices
-function PartnerInvoices() {
-    return (
-        <div className="max-w-7xl">
-            <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">Invoices & Payments</h1>
-                <button className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700">
-                    Submit New Invoice
-                </button>
-            </div>
-
-            <div className="grid grid-cols-4 gap-6 mb-8">
-                <StatCard title="Outstanding" value="₹45,200" subtitle="Due: Nov 30" icon="dollar" />
-                <StatCard title="Paid (Month)" value="₹1,98,300" subtitle="24 invoices" icon="dollar" />
-                <StatCard title="Pending Approval" value="2" subtitle="Review needed" icon="file" />
-                <StatCard title="Avg Payment Time" value="12 days" subtitle="On schedule" icon="clock" />
-            </div>
-
-            <div className="bg-white rounded-xl p-8 shadow-sm text-center text-gray-500">
-                <Icon name="dollar" className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <p>Invoice management interface would be displayed here</p>
-                <p className="text-sm mt-2">Submit, track, and manage all invoices and payments</p>
-            </div>
-        </div>
-    );
-}
-
-// Partner Contracts
-function PartnerContracts() {
-    return (
-        <div className="max-w-7xl">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8">Contracts & Agreements</h1>
-            <div className="bg-white rounded-xl p-8 shadow-sm text-center text-gray-500">
-                <Icon name="contract" className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <p>Contract management interface would be displayed here</p>
-                <p className="text-sm mt-2">View, sign, and manage partnership agreements</p>
-            </div>
-        </div>
-    );
-}
-
-// Partner Performance
-function PartnerPerformance() {
-    return (
-        <div className="max-w-7xl">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8">Performance Analytics</h1>
-            <div className="bg-white rounded-xl p-8 shadow-sm text-center text-gray-500">
-                <Icon name="chart" className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <p>Performance analytics and insights would be displayed here</p>
-                <p className="text-sm mt-2">Track KPIs, ratings, and business metrics</p>
-            </div>
-        </div>
-    );
-}
-
-// Partner Communications
-function PartnerCommunications() {
-    return (
-        <div className="max-w-7xl">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8">Communications</h1>
-            <div className="bg-white rounded-xl p-8 shadow-sm text-center text-gray-500">
-                <Icon name="message" className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <p>Communication and messaging interface would be displayed here</p>
-                <p className="text-sm mt-2">Messages, announcements, and support tickets</p>
-            </div>
-        </div>
-    );
-}
-
-// Partner Opportunities
-function PartnerOpportunities() {
-    return (
-        <div className="max-w-7xl">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8">Business Opportunities</h1>
+        // PARTNER PORTAL - Responsive
+        function PartnerPortal({ isMobile }) {
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [sidebarOpen, setSidebarOpen] = useState(false);
             
-            <div className="grid grid-cols-3 gap-6 mb-8">
-                {/* Opportunity Cards */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border-2 border-indigo-200">
-                    <div className="text-3xl mb-3">🌟</div>
-                    <h3 className="text-lg font-semibold mb-2">New Product Opportunity</h3>
-                    <p className="text-sm text-gray-600 mb-4">The Golden Hues is looking for premium tea suppliers for Q1 2026</p>
-                    <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-500">Posted: Nov 10</span>
-                        <button className="text-indigo-600 text-sm font-semibold hover:underline">View Details →</button>
-                    </div>
-                </div>
+            const tabs = [
+                { id: 'dashboard', name: 'Dashboard', icon: 'home' },
+                { id: 'orders', name: 'Orders & Supplies', icon: 'truck' },
+                { id: 'invoices', name: 'Invoices', icon: 'dollar' },
+                { id: 'contracts', name: 'Contracts', icon: 'contract' },
+                { id: 'performance', name: 'Performance', icon: 'chart' },
+                { id: 'communications', name: 'Communications', icon: 'message' },
+                { id: 'opportunities', name: 'Opportunities', icon: 'star' },
+                { id: 'profile', name: 'Profile', icon: 'user' }
+            ];
 
-                <div className="bg-white rounded-xl p-6 shadow-sm border-2 border-green-200">
-                    <div className="text-3xl mb-3">🎯</div>
-                    <h3 className="text-lg font-semibold mb-2">Volume Discount Program</h3>
-                    <p className="text-sm text-gray-600 mb-4">Qualify for up to 15% discount on bulk orders over 50kg/month</p>
-                    <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-500">Active Program</span>
-                        <button className="text-green-600 text-sm font-semibold hover:underline">Apply Now →</button>
-                    </div>
-                </div>
+            return (
+                <div className="flex h-full relative">
+                    {/* Mobile Overlay */}
+                    {isMobile && sidebarOpen && (
+                        <div 
+                            className="mobile-overlay active"
+                            onClick={() => setSidebarOpen(false)}
+                        />
+                    )}
 
-                <div className="bg-white rounded-xl p-6 shadow-sm border-2 border-amber-200">
-                    <div className="text-3xl mb-3">📢</div>
-                    <h3 className="text-lg font-semibold mb-2">Co-Marketing Initiative</h3>
-                    <p className="text-sm text-gray-600 mb-4">Feature your brand in our Golden Era festival event in January</p>
-                    <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-500">Limited Spots</span>
-                        <button className="text-amber-600 text-sm font-semibold hover:underline">Learn More →</button>
-                    </div>
-                </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-                <h3 className="text-lg font-semibold mb-4">Past Opportunities You Participated In</h3>
-                <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                            <div className="font-medium text-sm">Summer Menu Launch 2025</div>
-                            <div className="text-xs text-gray-500">Status: Completed</div>
-                        </div>
-                        <span className="text-green-600 text-sm font-semibold">Success</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                            <div className="font-medium text-sm">Festival Supply Partnership</div>
-                            <div className="text-xs text-gray-500">Status: Completed</div>
-                        </div>
-                        <span className="text-green-600 text-sm font-semibold">Success</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// Partner Profile
-function PartnerProfile() {
-    return (
-        <div className="max-w-5xl">
-            <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">Partner Profile</h1>
-                <button className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700">
-                    Edit Profile
-                </button>
-            </div>
-
-            <div className="grid grid-cols-3 gap-6 mb-8">
-                {/* Company Info */}
-                <div className="col-span-2 bg-white rounded-xl p-6 shadow-sm">
-                    <h2 className="text-xl font-semibold mb-6">Company Information</h2>
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <div className="text-sm text-gray-600 mb-1">Company Name</div>
-                                <div className="font-semibold">Karnataka Coffee Suppliers</div>
-                            </div>
-                            <div>
-                                <div className="text-sm text-gray-600 mb-1">Partner ID</div>
-                                <div className="font-semibold">PART-2025-042</div>
+                    {/* Sidebar */}
+                    <div className={`sidebar w-64 bg-white border-r border-gray-200 overflow-y-auto ${isMobile && sidebarOpen ? 'active' : ''}`}>
+                        <div className="p-4 md:p-6">
+                            {/* Mobile Close Button */}
+                            {isMobile && (
+                                <button
+                                    onClick={() => setSidebarOpen(false)}
+                                    className="mb-4 text-gray-600 hover:text-gray-900"
+                                >
+                                    <Icon name="close" className="text-2xl" />
+                                </button>
+                            )}
+                            
+                            <div className="text-sm text-gray-500 mb-4">Partner Portal</div>
+                            <div className="space-y-1">
+                                {tabs.map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => {
+                                            setActiveTab(tab.id);
+                                            if (isMobile) setSidebarOpen(false);
+                                        }}
+                                        className={`w-full flex items-center space-x-3 px-3 md:px-4 py-2 md:py-3 rounded-lg transition-colors text-sm md:text-base ${
+                                            activeTab === tab.id 
+                                                ? 'bg-indigo-100 text-indigo-900' 
+                                                : 'text-gray-700 hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        <Icon name={tab.icon} />
+                                        <span className="font-medium">{tab.name}</span>
+                                    </button>
+                                ))}
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <div className="text-sm text-gray-600 mb-1">Category</div>
-                                <div className="font-semibold">Food Supplier</div>
-                            </div>
-                            <div>
-                                <div className="text-sm text-gray-600 mb-1">Partnership Since</div>
-                                <div className="font-semibold">March 2025</div>
-                            </div>
-                        </div>
-                        <div>
-                            <div className="text-sm text-gray-600 mb-1">Contact Person</div>
-                            <div className="font-semibold">Ramesh Kumar</div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <div className="text-sm text-gray-600 mb-1">Email</div>
-                                <div className="font-semibold">ramesh@karnatakacoffee.com</div>
-                            </div>
-                            <div>
-                                <div className="text-sm text-gray-600 mb-1">Phone</div>
-                                <div className="font-semibold">+91-98XXX-XXXXX</div>
-                            </div>
-                        </div>
-                        <div>
-                            <div className="text-sm text-gray-600 mb-1">Address</div>
-                            <div className="font-semibold">123 Coffee Estate Road, Coorg, Karnataka - 571201</div>
-                        </div>
                     </div>
-                </div>
 
-                {/* Partnership Status */}
-                <div className="bg-white rounded-xl p-6 shadow-sm">
-                    <h2 className="text-xl font-semibold mb-6">Partnership Status</h2>
-                    <div className="text-center mb-6">
-                        <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <Icon name="star" className="w-10 h-10" />
-                        </div>
-                        <div className="text-2xl font-bold mb-1">Gold Partner</div>
-                        <div className="text-sm text-gray-600">Tier 2 of 3</div>
-                    </div>
-                    <div className="space-y-3">
-                        <div className="p-3 bg-indigo-50 rounded-lg">
-                            <div className="text-sm text-gray-600">Partner Rating</div>
-                            <div className="text-2xl font-bold text-indigo-600">4.8/5.0</div>
-                        </div>
-                        <div className="p-3 bg-green-50 rounded-lg">
-                            <div className="text-sm text-gray-600">Contract Status</div>
-                            <div className="text-lg font-bold text-green-600">Active</div>
-                        </div>
-                        <div className="p-3 bg-amber-50 rounded-lg">
-                            <div className="text-sm text-gray-600">Renewal Due</div>
-                            <div className="text-lg font-bold">Dec 31, 2025</div>
+                    {/* Main Content */}
+                    <div className="flex-1 overflow-auto">
+                        {/* Mobile Menu Button */}
+                        {isMobile && !sidebarOpen && (
+                            <button
+                                onClick={() => setSidebarOpen(true)}
+                                className="fixed bottom-4 right-4 bg-indigo-500 text-white p-4 rounded-full shadow-lg z-30"
+                            >
+                                <Icon name="menu" className="text-2xl" />
+                            </button>
+                        )}
+                        
+                        <div className="p-4 md:p-8">
+                            {activeTab === 'dashboard' && <PartnerDashboard isMobile={isMobile} />}
+                            {activeTab === 'orders' && <PartnerOrders isMobile={isMobile} />}
+                            {activeTab === 'invoices' && <PartnerInvoices isMobile={isMobile} />}
+                            {activeTab === 'contracts' && <PartnerContracts isMobile={isMobile} />}
+                            {activeTab === 'performance' && <PartnerPerformance isMobile={isMobile} />}
+                            {activeTab === 'communications' && <PartnerCommunications isMobile={isMobile} />}
+                            {activeTab === 'opportunities' && <PartnerOpportunities isMobile={isMobile} />}
+                            {activeTab === 'profile' && <PartnerProfile isMobile={isMobile} />}
                         </div>
                     </div>
                 </div>
-            </div>
+            );
+        }
 
-            {/* Business Metrics */}
-            <div className="bg-white rounded-xl p-6 shadow-sm mb-8">
-                <h3 className="text-lg font-semibold mb-4">Business Metrics (Lifetime)</h3>
-                <div className="grid grid-cols-5 gap-4">
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                        <div className="text-2xl font-bold mb-1">142</div>
-                        <div className="text-sm text-gray-600">Total Orders</div>
+        // Partner Dashboard - Responsive
+        function PartnerDashboard({ isMobile }) {
+            return (
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 md:mb-8 space-y-2 md:space-y-0">
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Welcome, Karnataka Coffee Suppliers! 🤝</h1>
+                        <div className="text-xs md:text-sm text-gray-600">Partner ID: PART-2025-042</div>
                     </div>
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                        <div className="text-2xl font-bold mb-1">₹12.4L</div>
-                        <div className="text-sm text-gray-600">Total Revenue</div>
-                    </div>
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                        <div className="text-2xl font-bold mb-1">98%</div>
-                        <div className="text-sm text-gray-600">Fulfillment Rate</div>
-                    </div>
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                        <div className="text-2xl font-bold mb-1">92%</div>
-                        <div className="text-sm text-gray-600">On-Time Delivery</div>
-                    </div>
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                        <div className="text-2xl font-bold mb-1">4.8</div>
-                        <div className="text-sm text-gray-600">Avg Rating</div>
-                    </div>
-                </div>
-            </div>
 
-            {/* Documents & Certifications */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-                <h3 className="text-lg font-semibold mb-4">Documents & Certifications</h3>
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 border border-gray-200 rounded-lg flex items-center justify-between">
-                        <div>
-                            <div className="font-medium">Partnership Agreement</div>
-                            <div className="text-sm text-gray-500">Valid until Dec 31, 2025</div>
-                        </div>
-                        <button className="text-indigo-600 text-sm hover:underline">View</button>
+                    {/* Top Stats */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
+                        <StatCard title="Total Orders (Month)" value="24" subtitle="↑ 15%" icon="truck" />
+                        <StatCard title="Outstanding Amount" value="₹45,200" subtitle="Due: Nov 30" icon="dollar" />
+                        <StatCard title="Active Products" value="12" subtitle="In catalog" icon="package" />
+                        <StatCard title="Partner Rating" value="4.8/5.0" subtitle="⭐⭐⭐⭐⭐" icon="star" />
                     </div>
-                    <div className="p-4 border border-gray-200 rounded-lg flex items-center justify-between">
-                        <div>
-                            <div className="font-medium">FSSAI License</div>
-                            <div className="text-sm text-gray-500">Valid until Jun 30, 2026</div>
+
+                    {/* Main Content Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+                        {/* Recent Orders */}
+                        <div className="lg:col-span-2 bg-white rounded-xl p-4 md:p-6 shadow-sm">
+                            <h3 className="text-base md:text-lg font-semibold mb-4">Recent Orders</h3>
+                            <div className="space-y-3">
+                                <OrderRow 
+                                    orderId="ORD-1245" 
+                                    items="Coffee Beans (Arabica) - 10kg" 
+                                    amount="₹12,500" 
+                                    status="Delivered" 
+                                    date="Nov 15" 
+                                    statusColor="green" 
+                                    isMobile={isMobile}
+                                />
+                                <OrderRow 
+                                    orderId="ORD-1232" 
+                                    items="Coffee Beans (Robusta) - 5kg" 
+                                    amount="₹5,200" 
+                                    status="In Transit" 
+                                    date="Nov 16" 
+                                    statusColor="blue" 
+                                    isMobile={isMobile}
+                                />
+                                <OrderRow 
+                                    orderId="ORD-1228" 
+                                    items="Coffee Beans (Arabica) - 8kg" 
+                                    amount="₹10,000" 
+                                    status="Processing" 
+                                    date="Nov 17" 
+                                    statusColor="amber" 
+                                    isMobile={isMobile}
+                                />
+                                <OrderRow 
+                                    orderId="ORD-1220" 
+                                    items="Sample Pack - Mixed Beans" 
+                                    amount="₹2,500" 
+                                    status="Pending" 
+                                    date="Nov 17" 
+                                    statusColor="gray" 
+                                    isMobile={isMobile}
+                                />
+                            </div>
+                            <button className="text-indigo-600 text-xs md:text-sm mt-4 hover:underline">View All Orders →</button>
                         </div>
-                        <button className="text-indigo-600 text-sm hover:underline">View</button>
+
+                        {/* Quick Actions */}
+                        <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
+                            <h3 className="text-base md:text-lg font-semibold mb-4">Quick Actions</h3>
+                            <div className="space-y-2 md:space-y-3">
+                                <button className="w-full bg-indigo-600 text-white py-2 md:py-3 rounded-lg hover:bg-indigo-700 font-medium text-sm md:text-base">
+                                    Submit Invoice
+                                </button>
+                                <button className="w-full bg-gray-100 text-gray-700 py-2 md:py-3 rounded-lg hover:bg-gray-200 font-medium text-sm md:text-base">
+                                    View Catalog
+                                </button>
+                                <button className="w-full bg-gray-100 text-gray-700 py-2 md:py-3 rounded-lg hover:bg-gray-200 font-medium text-sm md:text-base">
+                                    Download Reports
+                                </button>
+                                <button className="w-full bg-gray-100 text-gray-700 py-2 md:py-3 rounded-lg hover:bg-gray-200 font-medium text-sm md:text-base">
+                                    Contact Support
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div className="p-4 border border-gray-200 rounded-lg flex items-center justify-between">
-                        <div>
-                            <div className="font-medium">GST Certificate</div>
-                            <div className="text-sm text-gray-500">GSTIN: 29XXXXX1234Z5</div>
+
+                    {/* Pending Actions */}
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 md:p-6 mb-6 md:mb-8">
+                        <h3 className="font-semibold text-amber-900 mb-4 text-sm md:text-base">⚠️ Pending Actions (3)</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+                            <div className="p-3 md:p-4 bg-white rounded-lg">
+                                <div className="text-xs md:text-sm font-semibold mb-1">Invoice Approval Needed</div>
+                                <div className="text-xs text-gray-600 mb-2">Invoice #INV-789 - ₹12,500</div>
+                                <button className="text-amber-600 text-xs hover:underline">Review Now →</button>
+                            </div>
+                            <div className="p-3 md:p-4 bg-white rounded-lg">
+                                <div className="text-xs md:text-sm font-semibold mb-1">Contract Renewal</div>
+                                <div className="text-xs text-gray-600 mb-2">Expires: Dec 31, 2025</div>
+                                <button className="text-amber-600 text-xs hover:underline">Review Contract →</button>
+                            </div>
+                            <div className="p-3 md:p-4 bg-white rounded-lg">
+                                <div className="text-xs md:text-sm font-semibold mb-1">Quality Feedback</div>
+                                <div className="text-xs text-gray-600 mb-2">Recent order feedback available</div>
+                                <button className="text-amber-600 text-xs hover:underline">View Feedback →</button>
+                            </div>
                         </div>
-                        <button className="text-indigo-600 text-sm hover:underline">View</button>
-                    </div>
-                    <div className="p-4 border border-gray-200 rounded-lg flex items-center justify-between">
-                        <div>
-                            <div className="font-medium">Quality Certificate</div>
-                            <div className="text-sm text-gray-500">ISO 22000:2018</div>
-                        </div>
-                        <button className="text-indigo-600 text-sm hover:underline">View</button>
                     </div>
                 </div>
-            </div>
-        </div>
-    );
-}
+            );
+        }
+
+        // Order Row Component - Responsive
+        function OrderRow({ orderId, items, amount, status, date, statusColor, isMobile }) {
+            const statusColors = {
+                green: 'bg-green-50 text-green-700',
+                blue: 'bg-blue-50 text-blue-700',
+                amber: 'bg-amber-50 text-amber-700',
+                gray: 'bg-gray-100 text-gray-600'
+            };
+
+            return (
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between p-3 bg-gray-50 rounded-lg space-y-2 md:space-y-0">
+                    <div className="flex-1">
+                        <div className="font-medium text-xs md:text-sm">{orderId}</div>
+                        <div className="text-xs text-gray-600 truncate">{items}</div>
+                        <div className="text-xs text-gray-500">{date}</div>
+                    </div>
+                    <div className="flex items-center justify-between md:justify-end md:space-x-4">
+                        <div className="font-semibold text-sm md:text-base">{amount}</div>
+                        <span className={`text-xs px-2 py-1 rounded ${statusColors[statusColor]}`}>
+                            {status}
+                        </span>
+                    </div>
+                </div>
+            );
+        }
+
+        // Partner Orders - Responsive
+        function PartnerOrders({ isMobile }) {
+            return (
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 md:mb-8 space-y-3 md:space-y-0">
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Orders & Supplies</h1>
+                        <button className="bg-indigo-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold hover:bg-indigo-700 text-sm md:text-base">
+                            Create New Order
+                        </button>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-4 md:mb-6">
+                        <button className="px-3 md:px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs md:text-sm">All Orders</button>
+                        <button className="px-3 md:px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-xs md:text-sm">Pending</button>
+                        <button className="px-3 md:px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-xs md:text-sm">In Transit</button>
+                        <button className="px-3 md:px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-xs md:text-sm">Delivered</button>
+                    </div>
+
+                    <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
+                        <h3 className="text-base md:text-lg font-semibold mb-4">Order History</h3>
+                        <div className="overflow-x-auto">
+                            <table className="w-full min-w-[600px]">
+                                <thead className="border-b border-gray-200">
+                                    <tr>
+                                        <th className="text-left py-3 px-2 md:px-4 text-xs md:text-sm font-semibold text-gray-600">Order ID</th>
+                                        <th className="text-left py-3 px-2 md:px-4 text-xs md:text-sm font-semibold text-gray-600">Items</th>
+                                        <th className="text-left py-3 px-2 md:px-4 text-xs md:text-sm font-semibold text-gray-600">Date</th>
+                                        <th className="text-left py-3 px-2 md:px-4 text-xs md:text-sm font-semibold text-gray-600">Amount</th>
+                                        <th className="text-left py-3 px-2 md:px-4 text-xs md:text-sm font-semibold text-gray-600">Status</th>
+                                        <th className="text-left py-3 px-2 md:px-4 text-xs md:text-sm font-semibold text-gray-600">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="border-b border-gray-100">
+                                        <td className="py-3 px-2 md:px-4 text-xs md:text-sm">ORD-1245</td>
+                                        <td className="py-3 px-2 md:px-4 text-xs md:text-sm">Arabica Beans 10kg</td>
+                                        <td className="py-3 px-2 md:px-4 text-xs md:text-sm">Nov 15, 2025</td>
+                                        <td className="py-3 px-2 md:px-4 text-xs md:text-sm font-semibold">₹12,500</td>
+                                        <td className="py-3 px-2 md:px-4">
+                                            <span className="text-xs px-2 py-1 bg-green-50 text-green-700 rounded">Delivered</span>
+                                        </td>
+                                        <td className="py-3 px-2 md:px-4">
+                                            <button className="text-indigo-600 text-xs md:text-sm hover:underline">View</button>
+                                        </td>
+                                    </tr>
+                                    <tr className="border-b border-gray-100">
+                                        <td className="py-3 px-2 md:px-4 text-xs md:text-sm">ORD-1232</td>
+                                        <td className="py-3 px-2 md:px-4 text-xs md:text-sm">Robusta Beans 5kg</td>
+                                        <td className="py-3 px-2 md:px-4 text-xs md:text-sm">Nov 16, 2025</td>
+                                        <td className="py-3 px-2 md:px-4 text-xs md:text-sm font-semibold">₹5,200</td>
+                                        <td className="py-3 px-2 md:px-4">
+                                            <span className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded">In Transit</span>
+                                        </td>
+                                        <td className="py-3 px-2 md:px-4">
+                                            <button className="text-indigo-600 text-xs md:text-sm hover:underline">Track</button>
+                                        </td>
+                                    </tr>
+                                    <tr className="border-b border-gray-100">
+                                        <td className="py-3 px-2 md:px-4 text-xs md:text-sm">ORD-1228</td>
+                                        <td className="py-3 px-2 md:px-4 text-xs md:text-sm">Arabica Beans 8kg</td>
+                                        <td className="py-3 px-2 md:px-4 text-xs md:text-sm">Nov 17, 2025</td>
+                                        <td className="py-3 px-2 md:px-4 text-xs md:text-sm font-semibold">₹10,000</td>
+                                        <td className="py-3 px-2 md:px-4">
+                                            <span className="text-xs px-2 py-1 bg-amber-50 text-amber-700 rounded">Processing</span>
+                                        </td>
+                                        <td className="py-3 px-2 md:px-4">
+                                            <button className="text-indigo-600 text-xs md:text-sm hover:underline">Update</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Partner Invoices - Responsive
+        function PartnerInvoices({ isMobile }) {
+            return (
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 md:mb-8 space-y-3 md:space-y-0">
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Invoices & Payments</h1>
+                        <button className="bg-indigo-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold hover:bg-indigo-700 text-sm md:text-base">
+                            Submit New Invoice
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
+                        <StatCard title="Outstanding" value="₹45,200" subtitle="Due: Nov 30" icon="dollar" />
+                        <StatCard title="Paid (Month)" value="₹1,98,300" subtitle="24 invoices" icon="dollar" />
+                        <StatCard title="Pending Approval" value="2" subtitle="Review needed" icon="file" />
+                        <StatCard title="Avg Payment Time" value="12 days" subtitle="On schedule" icon="clock" />
+                    </div>
+
+                    <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm text-center text-gray-500">
+                        <Icon name="dollar" className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 text-gray-300" />
+                        <p className="text-sm md:text-base">Invoice management interface would be displayed here</p>
+                        <p className="text-xs md:text-sm mt-2">Submit, track, and manage all invoices and payments</p>
+                    </div>
+                </div>
+            );
+        }
+
+        // Partner Contracts - Responsive
+        function PartnerContracts({ isMobile }) {
+            return (
+                <div className="max-w-7xl mx-auto">
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 md:mb-8">Contracts & Agreements</h1>
+                    <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm text-center text-gray-500">
+                        <Icon name="contract" className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 text-gray-300" />
+                        <p className="text-sm md:text-base">Contract management interface would be displayed here</p>
+                        <p className="text-xs md:text-sm mt-2">View, sign, and manage partnership agreements</p>
+                    </div>
+                </div>
+            );
+        }
+
+        // Partner Performance - Responsive
+        function PartnerPerformance({ isMobile }) {
+            return (
+                <div className="max-w-7xl mx-auto">
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 md:mb-8">Performance Analytics</h1>
+                    <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm text-center text-gray-500">
+                        <Icon name="chart" className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 text-gray-300" />
+                        <p className="text-sm md:text-base">Performance analytics and insights would be displayed here</p>
+                        <p className="text-xs md:text-sm mt-2">Track KPIs, ratings, and business metrics</p>
+                    </div>
+                </div>
+            );
+        }
+
+        // Partner Communications - Responsive
+        function PartnerCommunications({ isMobile }) {
+            return (
+                <div className="max-w-7xl mx-auto">
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 md:mb-8">Communications</h1>
+                    <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm text-center text-gray-500">
+                        <Icon name="message" className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 text-gray-300" />
+                        <p className="text-sm md:text-base">Communication and messaging interface would be displayed here</p>
+                        <p className="text-xs md:text-sm mt-2">Messages, announcements, and support tickets</p>
+                    </div>
+                </div>
+            );
+        }
+
+        // Partner Opportunities - Responsive
+        function PartnerOpportunities({ isMobile }) {
+            return (
+                <div className="max-w-7xl mx-auto">
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 md:mb-8">Business Opportunities</h1>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+                        {/* Opportunity Cards */}
+                        <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border-2 border-indigo-200">
+                            <div className="text-3xl mb-3">🌟</div>
+                            <h3 className="text-base md:text-lg font-semibold mb-2">New Product Opportunity</h3>
+                            <p className="text-xs md:text-sm text-gray-600 mb-4">The Golden Hues is looking for premium tea suppliers for Q1 2026</p>
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs text-gray-500">Posted: Nov 10</span>
+                                <button className="text-indigo-600 text-xs md:text-sm font-semibold hover:underline">View Details →</button>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border-2 border-green-200">
+                            <div className="text-3xl mb-3">🎯</div>
+                            <h3 className="text-base md:text-lg font-semibold mb-2">Volume Discount Program</h3>
+                            <p className="text-xs md:text-sm text-gray-600 mb-4">Qualify for up to 15% discount on bulk orders over 50kg/month</p>
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs text-gray-500">Active Program</span>
+                                <button className="text-green-600 text-xs md:text-sm font-semibold hover:underline">Apply Now →</button>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border-2 border-amber-200">
+                            <div className="text-3xl mb-3">📢</div>
+                            <h3 className="text-base md:text-lg font-semibold mb-2">Co-Marketing Initiative</h3>
+                            <p className="text-xs md:text-sm text-gray-600 mb-4">Feature your brand in our Golden Era festival event in January</p>
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs text-gray-500">Limited Spots</span>
+                                <button className="text-amber-600 text-xs md:text-sm font-semibold hover:underline">Learn More →</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
+                        <h3 className="text-base md:text-lg font-semibold mb-4">Past Opportunities You Participated In</h3>
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div>
+                                    <div className="font-medium text-xs md:text-sm">Summer Menu Launch 2025</div>
+                                    <div className="text-xs text-gray-500">Status: Completed</div>
+                                </div>
+                                <span className="text-green-600 text-xs md:text-sm font-semibold">Success</span>
+                            </div>
+                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div>
+                                    <div className="font-medium text-xs md:text-sm">Festival Supply Partnership</div>
+                                    <div className="text-xs text-gray-500">Status: Completed</div>
+                                </div>
+                                <span className="text-green-600 text-xs md:text-sm font-semibold">Success</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Partner Profile - Responsive
+        function PartnerProfile({ isMobile }) {
+            return (
+                <div className="max-w-5xl mx-auto">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 md:mb-8 space-y-3 md:space-y-0">
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Partner Profile</h1>
+                        <button className="bg-indigo-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold hover:bg-indigo-700 text-sm md:text-base">
+                            Edit Profile
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+                        {/* Company Info */}
+                        <div className="lg:col-span-2 bg-white rounded-xl p-4 md:p-6 shadow-sm">
+                            <h2 className="text-lg md:text-xl font-semibold mb-4 md:mb-6">Company Information</h2>
+                            <div className="space-y-3 md:space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                                    <div>
+                                        <div className="text-xs md:text-sm text-gray-600 mb-1">Company Name</div>
+                                        <div className="font-semibold text-sm md:text-base">Karnataka Coffee Suppliers</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-xs md:text-sm text-gray-600 mb-1">Partner ID</div>
+                                        <div className="font-semibold text-sm md:text-base">PART-2025-042</div>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                                    <div>
+                                        <div className="text-xs md:text-sm text-gray-600 mb-1">Category</div>
+                                        <div className="font-semibold text-sm md:text-base">Food Supplier</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-xs md:text-sm text-gray-600 mb-1">Partnership Since</div>
+                                        <div className="font-semibold text-sm md:text-base">March 2025</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-xs md:text-sm text-gray-600 mb-1">Contact Person</div>
+                                    <div className="font-semibold text-sm md:text-base">Ramesh Kumar</div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                                    <div>
+                                        <div className="text-xs md:text-sm text-gray-600 mb-1">Email</div>
+                                        <div className="font-semibold text-xs md:text-sm break-all">ramesh@karnatakacoffee.com</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-xs md:text-sm text-gray-600 mb-1">Phone</div>
+                                        <div className="font-semibold text-sm md:text-base">+91-98XXX-XXXXX</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-xs md:text-sm text-gray-600 mb-1">Address</div>
+                                    <div className="font-semibold text-xs md:text-sm">123 Coffee Estate Road, Coorg, Karnataka - 571201</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Partnership Status */}
+                        <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
+                            <h2 className="text-lg md:text-xl font-semibold mb-4 md:mb-6">Partnership Status</h2>
+                            <div className="text-center mb-6">
+                                <div className="w-16 h-16 md:w-20 md:h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <Icon name="star" className="w-8 h-8 md:w-10 md:h-10" />
+                                </div>
+                                <div className="text-xl md:text-2xl font-bold mb-1">Gold Partner</div>
+                                <div className="text-xs md:text-sm text-gray-600">Tier 2 of 3</div>
+                            </div>
+                            <div className="space-y-3">
+                                <div className="p-3 bg-indigo-50 rounded-lg">
+                                    <div className="text-xs md:text-sm text-gray-600">Partner Rating</div>
+                                    <div className="text-xl md:text-2xl font-bold text-indigo-600">4.8/5.0</div>
+                                </div>
+                                <div className="p-3 bg-green-50 rounded-lg">
+                                    <div className="text-xs md:text-sm text-gray-600">Contract Status</div>
+                                    <div className="text-base md:text-lg font-bold text-green-600">Active</div>
+                                </div>
+                                <div className="p-3 bg-amber-50 rounded-lg">
+                                    <div className="text-xs md:text-sm text-gray-600">Renewal Due</div>
+                                    <div className="text-base md:text-lg font-bold">Dec 31, 2025</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Business Metrics */}
+                    <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm mb-6 md:mb-8">
+                        <h3 className="text-base md:text-lg font-semibold mb-4">Business Metrics (Lifetime)</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
+                            <div className="text-center p-3 md:p-4 bg-gray-50 rounded-lg">
+                                <div className="text-xl md:text-2xl font-bold mb-1">142</div>
+                                <div className="text-xs md:text-sm text-gray-600">Total Orders</div>
+                            </div>
+                            <div className="text-center p-3 md:p-4 bg-gray-50 rounded-lg">
+                                <div className="text-xl md:text-2xl font-bold mb-1">₹12.4L</div>
+                                <div className="text-xs md:text-sm text-gray-600">Total Revenue</div>
+                            </div>
+                            <div className="text-center p-3 md:p-4 bg-gray-50 rounded-lg">
+                                <div className="text-xl md:text-2xl font-bold mb-1">98%</div>
+                                <div className="text-xs md:text-sm text-gray-600">Fulfillment Rate</div>
+                            </div>
+                            <div className="text-center p-3 md:p-4 bg-gray-50 rounded-lg">
+                                <div className="text-xl md:text-2xl font-bold mb-1">92%</div>
+                                <div className="text-xs md:text-sm text-gray-600">On-Time Delivery</div>
+                            </div>
+                            <div className="text-center p-3 md:p-4 bg-gray-50 rounded-lg">
+                                <div className="text-xl md:text-2xl font-bold mb-1">4.8</div>
+                                <div className="text-xs md:text-sm text-gray-600">Avg Rating</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Documents & Certifications */}
+                    <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
+                        <h3 className="text-base md:text-lg font-semibold mb-4">Documents & Certifications</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                            <div className="p-3 md:p-4 border border-gray-200 rounded-lg flex items-center justify-between">
+                                <div>
+                                    <div className="font-medium text-xs md:text-sm">Partnership Agreement</div>
+                                    <div className="text-xs text-gray-500">Valid until Dec 31, 2025</div>
+                                </div>
+                                <button className="text-indigo-600 text-xs md:text-sm hover:underline">View</button>
+                            </div>
+                            <div className="p-3 md:p-4 border border-gray-200 rounded-lg flex items-center justify-between">
+                                <div>
+                                    <div className="font-medium text-xs md:text-sm">FSSAI License</div>
+                                    <div className="text-xs text-gray-500">Valid until Jun 30, 2026</div>
+                                </div>
+                                <button className="text-indigo-600 text-xs md:text-sm hover:underline">View</button>
+                            </div>
+                            <div className="p-3 md:p-4 border border-gray-200 rounded-lg flex items-center justify-between">
+                                <div>
+                                    <div className="font-medium text-xs md:text-sm">GST Certificate</div>
+                                    <div className="text-xs text-gray-500">GSTIN: 29XXXXX1234Z5</div>
+                                </div>
+                                <button className="text-indigo-600 text-xs md:text-sm hover:underline">View</button>
+                            </div>
+                            <div className="p-3 md:p-4 border border-gray-200 rounded-lg flex items-center justify-between">
+                                <div>
+                                    <div className="font-medium text-xs md:text-sm">Quality Certificate</div>
+                                    <div className="text-xs text-gray-500">ISO 22000:2018</div>
+                                </div>
+                                <button className="text-indigo-600 text-xs md:text-sm hover:underline">View</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
 
         // Render App
         ReactDOM.render(<App />, document.getElementById('root'));
